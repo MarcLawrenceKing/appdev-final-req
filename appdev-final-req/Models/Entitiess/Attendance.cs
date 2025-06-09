@@ -7,5 +7,8 @@
         public int EventId { get; set; }
         public bool IsPresent { get; set; }
 
+        // for foreign key
+        public Member Member { get; set; }
+        public Event Event { get; set; }
     }
 }

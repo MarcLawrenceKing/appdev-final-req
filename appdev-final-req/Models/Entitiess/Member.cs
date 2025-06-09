@@ -9,5 +9,9 @@
         public DateOnly Birthdate { get; set; }
         public bool IsActive { get; set; }
         public DateOnly DateJoined { get; set; }
+
+        // for foreign key
+
+        public ICollection<Attendance> Attendances { get; set; }
     }
 }
