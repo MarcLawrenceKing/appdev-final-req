@@ -8,7 +8,7 @@
         public string Phone { get; set; }
         public DateOnly Birthdate { get; set; }
         public bool IsActive { get; set; }
-        public DateOnly DateJoined { get; set; }
+        public DateOnly DateJoined { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 
         // for foreign key
 

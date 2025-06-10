@@ -3,10 +3,12 @@
 }
 <h1>@ViewData["Title"]</h1>
 
+@model List<appdev_final_req.Models.Entitiess.Member>
+
 <p>Members List.</p>
 <div class="">
     <div class="d-flex justify-content-end">
-        <a class="btn btn-primary">Add Members</a>
+        <a class="btn btn-primary" asp-controller="Members" asp-action="Add">Add Members</a>
     </div>
     <form class="d-flex mt-4" role="search">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -27,20 +29,24 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>mark@gmail.com</td>
-                <td>123</td>
-                <td>Jan 11</td>
-                <td>true</td>
-                <td>06/10/25</td>
-                <td class="d-flex justify-content-evenly">
-                    <i class="bi bi-pencil-square"></i>
-                    <i class="bi bi-trash3"></i>
-                </td>
+            @foreach (var member in Model)
+            {
+                <tr>
+                    <th scope="row">@member.Id</th>
+                    <td>@member.FullName</td>
+                    <td>@member.Email</td>
+                    <td>@member.Phone</td>
+                    <td>@member.Birthdate</td>
+                    <td>@member.IsActive</td>
+                    <td>@member.DateJoined</td>
+                    <td class="d-flex justify-content-evenly">
+                        <i class="bi bi-pencil-square"></i>
+                        <i class="bi bi-trash3"></i>
+                    </td>
 
-            </tr>
+                </tr>
+            }
+           
 
         </tbody>
     </table>
