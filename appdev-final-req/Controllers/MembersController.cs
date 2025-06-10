@@ -66,5 +66,21 @@ namespace appdev_final_req.Controllers
 
             return RedirectToAction("List");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)  // Simplified parameter
+        {
+            var member = await dbContext.Members.FindAsync(id);
+
+            if (member != null)
+            {
+                dbContext.Members.Remove(member);
+                await dbContext.SaveChangesAsync();
+                TempData["Message"] = "Member deleted successfully";
+            }
+
+            return RedirectToAction("List");
+        }
     }
 }
