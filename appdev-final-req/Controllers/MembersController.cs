@@ -40,5 +40,31 @@ namespace appdev_final_req.Controllers
             await dbContext.SaveChangesAsync();
             return RedirectToAction("List");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var member = await dbContext.Members.FindAsync(id);
+
+            return View(member);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Member viewModel)
+        {
+            var member = await dbContext.Members.FindAsync(viewModel.Id);
+
+            if (member is not null)
+            {
+                member.FullName = viewModel.FullName;
+                member.Email = viewModel.Email;
+                member.Phone = viewModel.Phone;
+                member.Birthdate = viewModel.Birthdate;
+
+                await dbContext.SaveChangesAsync();
+            }
+
+            return RedirectToAction("List");
+        }
     }
 }
