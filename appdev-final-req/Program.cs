@@ -8,14 +8,6 @@ builder.Services.AddControllersWithViews();
 
 // we will create a sql server in the app
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("MemberPortal")));
-
-// we will create a sql server in the app
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("EventPortal")));
-
-// we will create a sql server in the app
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("AttendancePortal")));
 
 var app = builder.Build();
