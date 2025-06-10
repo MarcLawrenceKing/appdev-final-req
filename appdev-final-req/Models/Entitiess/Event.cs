@@ -7,5 +7,8 @@
         public string Description { get; set; }
         public DateOnly EventDate { get; set; }
 
+        // for foreign key
+
+        public ICollection<Attendance> Attendances { get; set; }
     }
 }
