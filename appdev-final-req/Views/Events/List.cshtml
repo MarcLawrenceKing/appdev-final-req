@@ -1,6 +1,57 @@
 ﻿@{
-    ViewData["Title"] = "Events List";
+    ViewData["Title"] = "Event List";
 }
 <h1>@ViewData["Title"]</h1>
 
-<p>Events List.</p>
+@model List<appdev_final_req.Models.Entitiess.Event>
+
+<p>Event List.</p>
+<div class="">
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-success me-3" asp-controller="" asp-action="">Batch Upload</a>
+        <a class="btn btn-primary" asp-controller="Events" asp-action="Add">Add Event</a>
+
+    </div>
+    <form class="d-flex mt-4" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Event Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Event Date</th>
+                <th scope="col" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var eventz in Model)
+            {
+                <tr>
+                    <th scope="row">@eventz.Id</th>
+                    <td>@eventz.Title</td>
+                    <td>@eventz.Description</td>
+                    <td>@eventz.EventDate</td>
+
+                    <td class="d-flex justify-content-center gap-3">
+                        <a class="btn btn-primary" asp-controller="Events" asp-action="Edit" asp-route-id="@eventz.Id"><i class="bi bi-pencil-square"></i></a>
+                        <!-- In your view (List.cshtml or wherever) -->
+                        <form asp-action="Delete" asp-route-id="@eventz.Id" method="post" onsubmit="return confirm('Are you sure you want to delete @eventz.Title?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
+
+                    </td>
+
+                </tr>
+            }
+
+
+        </tbody>
+    </table>
+</div>
