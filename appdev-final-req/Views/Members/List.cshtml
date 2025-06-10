@@ -41,7 +41,7 @@
                     <td>@member.Birthdate</td>
                     <td>@member.IsActive</td>
                     <td>@member.DateJoined</td>
-                    <td class="d-flex justify-content-evenly">
+                    <td class="d-flex justify-content-center gap-3">
                         <a class="btn btn-primary" asp-controller="Members" asp-action="Edit" asp-route-id="@member.Id"><i class="bi bi-pencil-square"></i></a>
                         <!-- In your view (List.cshtml or wherever) -->
                         <form asp-action="Delete" asp-route-id="@member.Id" method="post" onsubmit="return confirm('Are you sure you want to delete @member.FullName?');">
