@@ -3,7 +3,6 @@ using appdev_final_req.Models;
 using appdev_final_req.Models.Entitiess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace appdev_final_req.Controllers
 {
@@ -86,7 +85,44 @@ namespace appdev_final_req.Controllers
 
             await dbContext.SaveChangesAsync();
 
+            await UpdateMemberActivityStatusAsync();
+
             return RedirectToAction("List");
+        }
+
+
+        // updates the isActive attribute to true if user is present for 50% of all events
+        // First UPDATE: Sets active members.
+        // Second UPDATE: Resets everyone else to inactive.
+        [HttpPost]
+        private async Task UpdateMemberActivityStatusAsync()
+        {
+            var sql = @"
+            DECLARE @TotalEvents INT;
+            SELECT @TotalEvents = COUNT(*) FROM Events;
+
+            UPDATE Members
+            SET IsActive = 1
+            WHERE Id IN (
+                SELECT MemberId
+                FROM Attendance
+                WHERE IsPresent = 1
+                GROUP BY MemberId
+                HAVING COUNT(*) * 1.0 / NULLIF(@TotalEvents, 0) >= 0.5
+            );
+
+            UPDATE Members
+            SET IsActive = 0
+            WHERE Id NOT IN (
+                SELECT MemberId
+                FROM Attendance
+                WHERE IsPresent = 1
+                GROUP BY MemberId
+                HAVING COUNT(*) * 1.0 / NULLIF(@TotalEvents, 0) >= 0.5
+            );
+        ";
+
+            await dbContext.Database.ExecuteSqlRawAsync(sql);
         }
     }
 }
