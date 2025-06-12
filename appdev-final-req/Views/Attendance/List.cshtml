@@ -3,4 +3,37 @@
 }
 <h1>@ViewData["Title"]</h1>
 
+@model List<appdev_final_req.Models.Entitiess.Event>
+
 <p>Attendance List.</p>
+<div class="">
+
+    <form class="d-flex mt-4" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+
+    <table class="table mt-4">
+        <thead>
+            <tr>               
+                <th scope="col">Event Title</th>
+                <th scope="col">Event Date</th>
+                <th scope="col" class="text-center">View Attendance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var eventz in Model)
+            {
+                <tr>
+                    <td>@eventz.Title</td>
+                    <td>@eventz.EventDate</td>
+                    <td class="text-center">
+                        <a class="btn btn-primary" asp-controller="Attendance" asp-action="MarkAttendance" asp-route-id="@eventz.Id"> <i class="bi bi-list-check"></i></a>
+                    </td>
+                </tr>
+            }
+
+
+        </tbody>
+    </table>
+</div>

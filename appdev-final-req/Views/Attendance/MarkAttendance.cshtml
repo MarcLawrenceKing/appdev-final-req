@@ -1,0 +1,47 @@
+﻿@{
+	ViewData["Title"] = "Mark Attendance";
+}
+@model List<appdev_final_req.Models.AttendanceViewModel> //ito ung gagamitin na model for this page
+
+@{
+	var eventId = (int)ViewBag.EventId;
+}
+
+<style>
+    /* style for check box*/
+    .form-check-input.custom-check:checked {
+        background-color: #0d6efd; /* Change to your custom color */
+        border-color: #0d6efd;
+    }
+</style>
+<h1>Attendance Form</h1>
+<p>Mark Attendance for @ViewBag.EventTitle</p>
+
+<form asp-action="MarkAttendance" method="post">
+    <input type="hidden" name="eventId" value="@eventId" />
+
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th>Member ID</th>
+                <th>Member</th>
+                <th class="text-center">isPresent?</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>@Model[i].MemberId</td>
+                    <td>@Model[i].FullName</td>
+                    <td class="text-center">
+                        <input type="hidden" name="attendanceList[@i].MemberId" value="@Model[i].MemberId" />
+                        <input style="transform: scale(1.5);" class="form-check-input custom-check" type="checkbox" name="attendanceList[@i].IsPresent" value="true" @(Model[i].IsPresent ? "checked" : "") />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button class="btn btn-primary" type="submit">Save Attendance</button>
+</form>
