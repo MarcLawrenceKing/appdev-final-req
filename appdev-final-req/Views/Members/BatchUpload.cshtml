@@ -1,0 +1,21 @@
+﻿@{
+	ViewData["Title"] = "Batch Upload";
+}
+@model appdev_final_req.Models.AddMemberViewModel //ito ung gagamitin na model for this page
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-controller="Members" asp-action="BatchUpload" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="file" class="form-label">Select CSV File</label>
+        <input type="file" class="form-control" name="file" id="file" accept=".csv" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Upload</button>
+    <a asp-controller="Members" asp-action="List" class="btn btn-danger">Back</a>
+</form>
+
+@if (!string.IsNullOrEmpty(ViewBag.Message as string))
+{
+    <div class="alert alert-info mt-3">@ViewBag.Message</div>
+}
