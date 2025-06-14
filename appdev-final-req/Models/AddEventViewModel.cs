@@ -6,7 +6,6 @@ namespace appdev_final_req.Models
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public string Phone { get; set; }
         public DateOnly EventDate { get; set; }
 
     }
