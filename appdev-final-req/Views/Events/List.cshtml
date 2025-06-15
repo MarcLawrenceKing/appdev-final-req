@@ -12,8 +12,8 @@
         <a class="btn btn-primary" asp-controller="Events" asp-action="Add">Add Event</a>
 
     </div>
-    <form class="d-flex mt-4" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+    <form class="d-flex mt-4" role="search" method="get" asp-action="List">
+        <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
         <button class="btn btn-outline-primary" type="submit">Search</button>
     </form>
 
