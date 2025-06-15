@@ -1,11 +1,13 @@
 ﻿using appdev_final_req.Data;
 using appdev_final_req.Models;
 using appdev_final_req.Models.Entitiess;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace appdev_final_req.Controllers
 {
+    [Authorize] // Protect the whole controller
     public class AttendanceController : Controller
     {
         private readonly ApplicationDbContext dbContext;

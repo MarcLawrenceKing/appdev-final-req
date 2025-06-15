@@ -7,9 +7,11 @@ using CsvHelper;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace appdev_final_req.Controllers
 {
+    [Authorize] // Protect the whole controller
     public class EventsController : Controller
     {
         private readonly ApplicationDbContext dbContext;
@@ -145,6 +147,25 @@ namespace appdev_final_req.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelected(string ids)
+        {
+            if (!string.IsNullOrEmpty(ids))
+            {
+                var idList = ids.Split(',').Select(id => int.Parse(id)).ToList();
 
+                var eventsToDelete = await dbContext.Events
+                    .Where(m => idList.Contains(m.Id))
+                    .ToListAsync();
+
+                dbContext.Events.RemoveRange(eventsToDelete);
+                await dbContext.SaveChangesAsync();
+
+                TempData["Message"] = $"{eventsToDelete.Count} events deleted successfully.";
+            }
+
+            return RedirectToAction("List");
+        }
     }
 }
