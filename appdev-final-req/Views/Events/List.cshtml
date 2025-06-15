@@ -10,48 +10,134 @@
     <div class="d-flex justify-content-end">
         <a class="btn btn-success me-3" asp-controller="Events" asp-action="BatchUpload">Batch Upload</a>
         <a class="btn btn-primary" asp-controller="Events" asp-action="Add">Add Event</a>
-
     </div>
+
     <form class="d-flex mt-4" role="search" method="get" asp-action="List">
         <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
         <button class="btn btn-outline-primary" type="submit">Search</button>
     </form>
 
-    <table class="table mt-4">
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success mt-3">@TempData["Message"]</div>
+    }
+
+    <table class="table mt-4" id="eventsTable">
         <thead>
             <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Event Title</th>
-                <th scope="col">Description</th>
-                <th scope="col">Event Date</th>
-                <th scope="col" class="text-center">Actions</th>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th onclick="sortTable(1)">
+                    <div class="no-wrap">ID <span id="sortIcon1" class="sort-icon"></span></div>
+                </th>
+                <th onclick="sortTable(2)">
+                    <div class="no-wrap">Event Title <span id="sortIcon2" class="sort-icon"></span></div>
+                </th>
+                <th onclick="sortTable(3)">
+                    <div class="no-wrap">Description <span id="sortIcon3" class="sort-icon"></span></div>
+                </th>
+                <th onclick="sortTable(4)">
+                    <div class="no-wrap">Event Date <span id="sortIcon4" class="sort-icon"></span></div>
+                </th>
+                <th class="text-center">Actions</th>
+
             </tr>
         </thead>
         <tbody>
             @foreach (var eventz in Model)
             {
                 <tr>
-                    <th scope="row">@eventz.Id</th>
+                    <td><input type="checkbox" class="row-checkbox" value="@eventz.Id" /></td>
+                    <td>@eventz.Id</td>
                     <td>@eventz.Title</td>
                     <td>@eventz.Description</td>
                     <td>@eventz.EventDate</td>
-
                     <td class="d-flex justify-content-center gap-3">
                         <a class="btn btn-primary" asp-controller="Events" asp-action="Edit" asp-route-id="@eventz.Id"><i class="bi bi-pencil-square"></i></a>
-                        <!-- In your view (List.cshtml or wherever) -->
                         <form asp-action="Delete" asp-route-id="@eventz.Id" method="post" onsubmit="return confirm('Are you sure you want to delete @eventz.Title?');">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-danger">
                                 <i class="bi bi-trash3"></i>
                             </button>
                         </form>
-
                     </td>
-
                 </tr>
             }
-
-
         </tbody>
     </table>
+
+    <form id="deleteSelectedForm" asp-controller="Events" asp-action="DeleteSelected" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ids" id="selectedIdsInput" />
+        <button type="submit" class="btn btn-danger mt-3" onclick="return confirm('Are you sure you want to delete the selected events?')">
+            Delete Selected
+        </button>
+    </form>
 </div>
+
+@section Scripts {
+    <script>
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll(".row-checkbox");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        document.getElementById("deleteSelectedForm").addEventListener("submit", function () {
+            const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+            document.getElementById("selectedIdsInput").value = ids.join(",");
+        });
+
+        let sortDirection = {};
+        let lastSortedCol = null;
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById("eventsTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].textContent.trim().toLowerCase();
+                const bText = b.cells[columnIndex].textContent.trim().toLowerCase();
+
+                // Date comparison
+                if (!isNaN(Date.parse(aText)) && !isNaN(Date.parse(bText))) {
+                    return sortDirection[columnIndex]
+                        ? new Date(aText) - new Date(bText)
+                        : new Date(bText) - new Date(aText);
+                }
+
+                // Number comparison
+                if (!isNaN(aText) && !isNaN(bText)) {
+                    return sortDirection[columnIndex]
+                        ? parseFloat(aText) - parseFloat(bText)
+                        : parseFloat(bText) - parseFloat(aText);
+                }
+
+                // Text comparison
+                return sortDirection[columnIndex]
+                    ? aText.localeCompare(bText)
+                    : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Clear previous sort icon
+            if (lastSortedCol && lastSortedCol !== columnIndex) {
+                const oldIcon = document.getElementById(`sortIcon${lastSortedCol}`);
+                if (oldIcon) oldIcon.innerHTML = '';
+            }
+
+            // Set new icon
+            const icon = sortDirection[columnIndex]
+                ? '<i class="bi bi-caret-up-fill"></i>'
+                : '<i class="bi bi-caret-down-fill"></i>';
+
+            const iconSpan = document.getElementById(`sortIcon${columnIndex}`);
+            if (iconSpan) iconSpan.innerHTML = icon;
+
+            lastSortedCol = columnIndex;
+        }
+    </script>
+}

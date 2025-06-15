@@ -17,25 +17,46 @@
         <button class="btn btn-outline-primary" type="submit">Search</button>
     </form>
 
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success mt-3">@TempData["Message"]</div>
+    }
 
-    <table class="table mt-4">
+
+    <table class="table mt-4" id="membersTable">
         <thead>
             <tr>
-                <th scope="col">ID</th>
-                <th scope="col">FullName</th>
-                <th scope="col">Email</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Birthdate</th>
-                <th scope="col">isActive</th>
-                <th scope="col">DateJoined</th>
-                <th scope="col" class="text-center">Actions</th>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th scope="col" onclick="sortTable(1)">
+                    <div class="no-wrap">ID <span id="sortIcon1" class="sort-icon"></span></div>
+                </th>
+                <th scope="col" onclick="sortTable(2)">
+                    <div class="no-wrap">FullName <span id="sortIcon2" class="sort-icon"></span></div>
+                </th>
+                <th scope="col" onclick="sortTable(3)">
+                    <div class="no-wrap">Email <span id="sortIcon3" class="sort-icon"></span></div>
+                </th>
+                <th scope="col" onclick="sortTable(4)">
+                    <div class="no-wrap">Phone <span id="sortIcon4" class="sort-icon"></span></div>
+                </th>
+                <th scope="col" onclick="sortTable(5)">
+                    <div class="no-wrap">Birthdate <span id="sortIcon5" class="sort-icon"></span></div>
+                </th>
+                <th scope="col" onclick="sortTable(6)">
+                    <div class="no-wrap">isActive <span id="sortIcon6" class="sort-icon"></span></div>
+                </th>
+                <th scope="col" onclick="sortTable(7)">
+                    <div class="no-wrap">DateJoined <span id="sortIcon7" class="sort-icon"></span></div>
+                </th>
+                <th class="text-center">Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var member in Model)
             {
                 <tr>
-                    <th scope="row">@member.Id</th>
+                    <td><input type="checkbox" class="row-checkbox" value="@member.Id" /></td>
+                    <td>@member.Id</td>
                     <td>@member.FullName</td>
                     <td>@member.Email</td>
                     <td>@member.Phone</td>
@@ -44,20 +65,90 @@
                     <td>@member.DateJoined</td>
                     <td class="d-flex justify-content-center gap-3">
                         <a class="btn btn-primary" asp-controller="Members" asp-action="Edit" asp-route-id="@member.Id"><i class="bi bi-pencil-square"></i></a>
-                        <!-- In your view (List.cshtml or wherever) -->
                         <form asp-action="Delete" asp-route-id="@member.Id" method="post" onsubmit="return confirm('Are you sure you want to delete @member.FullName?');">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-danger">
                                 <i class="bi bi-trash3"></i>
                             </button>
                         </form>
-                        
                     </td>
-
                 </tr>
             }
-           
-
         </tbody>
     </table>
+
+    <form id="deleteSelectedForm" asp-controller="Members" asp-action="DeleteSelected" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ids" id="selectedIdsInput" />
+        <button type="submit" class="btn btn-danger mt-3" onclick="return confirm('Are you sure you want to delete the selected members?')">
+            Delete Selected
+        </button>
+    </form>
+
 </div>
+
+@section Scripts {
+    <script>
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll(".row-checkbox");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        let sortDirection = {};
+        let lastSortedCol = null;
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById("membersTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            // Toggle direction
+            sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].textContent.trim().toLowerCase();
+                const bText = b.cells[columnIndex].textContent.trim().toLowerCase();
+
+                if (!isNaN(Date.parse(aText)) && !isNaN(Date.parse(bText))) {
+                    return sortDirection[columnIndex]
+                        ? new Date(aText) - new Date(bText)
+                        : new Date(bText) - new Date(aText);
+                }
+
+                if (!isNaN(aText) && !isNaN(bText)) {
+                    return sortDirection[columnIndex]
+                        ? aText - bText
+                        : bText - aText;
+                }
+
+                return sortDirection[columnIndex]
+                    ? aText.localeCompare(bText)
+                    : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Clear old icons
+            if (lastSortedCol && lastSortedCol !== columnIndex) {
+                const oldIcon = document.getElementById(`sortIcon${lastSortedCol}`);
+                if (oldIcon) oldIcon.innerHTML = '';
+            }
+
+            // Set new icon
+            const icon = sortDirection[columnIndex]
+                ? '<i class="bi bi-caret-up-fill"></i>'
+                : '<i class="bi bi-caret-down-fill"></i>';
+
+            const iconSpan = document.getElementById(`sortIcon${columnIndex}`);
+            if (iconSpan) iconSpan.innerHTML = icon;
+
+            lastSortedCol = columnIndex;
+        }
+
+        document.getElementById("deleteSelectedForm").addEventListener("submit", function (e) {
+            const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+            document.getElementById("selectedIdsInput").value = ids.join(",");
+        });
+    </script>
+}
