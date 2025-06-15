@@ -7,9 +7,11 @@ using CsvHelper;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace appdev_final_req.Controllers
 {
+    [Authorize] // Protect the whole controller
     public class EventsController : Controller
     {
         private readonly ApplicationDbContext dbContext;

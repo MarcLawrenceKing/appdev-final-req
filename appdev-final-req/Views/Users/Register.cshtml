@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Register";
+}
+
+@model appdev_final_req.Models.RegisterViewModel
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Register" method="post">
+    <div class="mt-3">
+        <label class="form-label">Username</label>
+        <input class="form-control" asp-for="Username" required/>
+    </div>
+    <div class="mt-3">
+        <label class="form-label">Password</label>
+        <input class="form-control" asp-for="Password" type="password" required />
+    </div>
+    <div class="mt-3">
+        <label class="form-label">Confirm Password</label>
+        <input class="form-control" asp-for="ConfirmPassword" type="password" required />
+    </div>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    <div class="mt-3">
+        <p> Already have an account? <a asp-controller="Users" asp-action="Login">Login.</a></p>
+    </div>
+    
+</form>
+<!-- Modal popup when register fail -->
+
+<div class="modal fade" id="registerErrorModal" tabindex="-1" aria-labelledby="registerErrorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="registerErrorModalLabel">Registration Failed</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Html.Raw(ViewData["RegisterError"])
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var hasError = '@ViewData["RegisterError"]' !== '';
+            if (hasError) {
+                var errorModal = new bootstrap.Modal(document.getElementById('registerErrorModal'));
+                errorModal.show();
+            }
+        });
+    </script>
+}
