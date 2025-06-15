@@ -19,12 +19,29 @@ namespace appdev_final_req.Controllers
         {
             this.dbContext = dbContext;
         }
+
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(string search)
         {
-            var members = await dbContext.Members.ToListAsync();
-            return View(members);
+            var members = dbContext.Members.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                members = members.Where(m =>
+                    m.FullName.ToLower().Contains(search.ToLower()) ||
+                    m.Email.ToLower().Contains(search.ToLower()) ||
+                    m.Phone.Contains(search) ||
+                    m.Birthdate.ToString().Contains(search) ||
+                    m.IsActive.ToString().ToLower().Contains(search.ToLower()) ||
+                    m.DateJoined.ToString().Contains(search)
+                );
+            }
+
+            var result = await members.ToListAsync();
+            return View(result);
         }
+
+
 
         [HttpGet]
         public IActionResult Add()
