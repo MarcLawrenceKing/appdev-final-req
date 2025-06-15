@@ -1,4 +1,6 @@
 using appdev_final_req.Data;
+using appdev_final_req.Models.Entitiess;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +10,21 @@ builder.Services.AddControllersWithViews();
 
 // we will create a sql server in the app
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("LinuxAttendancePortal")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("MarcAttendancePortal")));
+
+// dependency injection for identity library
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = false;              // Username-only login
+    options.SignIn.RequireConfirmedAccount = false;       // No need for email confirmation
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()         // Use your DB to store users
+.AddDefaultTokenProviders();                              // Enables password reset, etc.
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Users/Login"; // redirect here if not logged in
+});
 
 var app = builder.Build();
 
