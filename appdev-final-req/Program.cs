@@ -24,7 +24,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Users/Login"; // redirect here if not logged in
+    options.LoginPath = "/Home/Index"; // redirect here if not logged in
 });
 
 
