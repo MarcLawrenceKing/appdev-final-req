@@ -35,7 +35,7 @@ namespace appdev_final_req.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard", "Home");
             }
 
             // Error: show modal
@@ -56,7 +56,7 @@ namespace appdev_final_req.Controllers
             var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
 
             if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard", "Home");
 
             // Pass an error message using ViewData or TempData
             ViewData["LoginError"] = "Invalid username or password.";
