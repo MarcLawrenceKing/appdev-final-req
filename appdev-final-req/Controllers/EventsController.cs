@@ -7,9 +7,11 @@ using CsvHelper;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace appdev_final_req.Controllers
 {
+    [Authorize] // Protect the whole controller
     public class EventsController : Controller
     {
         private readonly ApplicationDbContext dbContext;
@@ -18,11 +20,24 @@ namespace appdev_final_req.Controllers
         {
             this.dbContext = dbContext;
         }
-        public async Task<IActionResult> List()
+        [HttpGet]
+        public async Task<IActionResult> List(string search)
         {
-            var events = await dbContext.Events.ToListAsync();
-            return View(events);
+            var events = dbContext.Events.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                events = events.Where(e =>
+                    e.Title.ToLower().Contains(search.ToLower()) ||
+                    e.Description.ToLower().Contains(search.ToLower()) ||
+                    e.EventDate.ToString().Contains(search)
+                );
+            }
+
+            var result = await events.ToListAsync();
+            return View(result);
         }
+
 
         [HttpGet]
         public IActionResult Add()
@@ -132,6 +147,25 @@ namespace appdev_final_req.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelected(string ids)
+        {
+            if (!string.IsNullOrEmpty(ids))
+            {
+                var idList = ids.Split(',').Select(id => int.Parse(id)).ToList();
 
+                var eventsToDelete = await dbContext.Events
+                    .Where(m => idList.Contains(m.Id))
+                    .ToListAsync();
+
+                dbContext.Events.RemoveRange(eventsToDelete);
+                await dbContext.SaveChangesAsync();
+
+                TempData["Message"] = $"{eventsToDelete.Count} events deleted successfully.";
+            }
+
+            return RedirectToAction("List");
+        }
     }
 }

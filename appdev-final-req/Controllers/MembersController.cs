@@ -7,10 +7,13 @@ using CsvHelper;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace appdev_final_req.Controllers
 {
+    [Authorize] // Protect the whole controller
+
     public class MembersController : Controller
     {
         private readonly ApplicationDbContext dbContext;
@@ -19,12 +22,29 @@ namespace appdev_final_req.Controllers
         {
             this.dbContext = dbContext;
         }
+
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(string search)
         {
-            var members = await dbContext.Members.ToListAsync();
-            return View(members);
+            var members = dbContext.Members.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                members = members.Where(m =>
+                    m.FullName.ToLower().Contains(search.ToLower()) ||
+                    m.Email.ToLower().Contains(search.ToLower()) ||
+                    m.Phone.Contains(search) ||
+                    m.Birthdate.ToString().Contains(search) ||
+                    m.IsActive.ToString().ToLower().Contains(search.ToLower()) ||
+                    m.DateJoined.ToString().Contains(search)
+                );
+            }
+
+            var result = await members.ToListAsync();
+            return View(result);
         }
+
+
 
         [HttpGet]
         public IActionResult Add()
@@ -36,10 +56,11 @@ namespace appdev_final_req.Controllers
         public async Task<IActionResult> Add(AddMemberViewModel viewModel)
         {
             var member = new Member
-            { FullName = viewModel.FullName,
-              Email = viewModel.Email,
-              Phone = viewModel.Phone,
-              Birthdate = viewModel.Birthdate,
+            {
+                FullName = viewModel.FullName,
+                Email = viewModel.Email,
+                Phone = viewModel.Phone,
+                Birthdate = viewModel.Birthdate,
             };
             await dbContext.Members.AddAsync(member);
             await dbContext.SaveChangesAsync();
@@ -133,10 +154,27 @@ namespace appdev_final_req.Controllers
                 return View();
             }
         }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelected(string ids)
+        {
+            if (!string.IsNullOrEmpty(ids))
+            {
+                var idList = ids.Split(',').Select(id => int.Parse(id)).ToList();
 
+                var membersToDelete = await dbContext.Members
+                    .Where(m => idList.Contains(m.Id))
+                    .ToListAsync();
 
+                dbContext.Members.RemoveRange(membersToDelete);
+                await dbContext.SaveChangesAsync();
 
+                TempData["Message"] = $"{membersToDelete.Count} members deleted successfully.";
+            }
 
+            return RedirectToAction("List");
+        }
 
     }
 }
