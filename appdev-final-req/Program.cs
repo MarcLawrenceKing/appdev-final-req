@@ -10,6 +10,7 @@ builder.Services.AddControllersWithViews();
 
 // we will create a sql server in the app
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
+
 options.UseSqlServer(builder.Configuration.GetConnectionString("MarcAttendancePortal")));
 
 // dependency injection for identity library
@@ -25,6 +26,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Users/Login"; // redirect here if not logged in
 });
+
 
 var app = builder.Build();
 

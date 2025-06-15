@@ -1,11 +1,11 @@
 ﻿@{
     ViewData["Title"] = "Event List";
 }
-<h1>@ViewData["Title"]</h1>
+<h1 style="text-align: center; font-family: 'Verdana'">@ViewData["Title"]</h1>
 
 @model List<appdev_final_req.Models.Entitiess.Event>
 
-<p>Event List.</p>
+<p style="text-align: center;">Add, Search, Edit, Delete, or Upload events here.</p>
 <div class="">
     <div class="d-flex justify-content-end">
         <a class="btn btn-success me-3" asp-controller="Events" asp-action="BatchUpload">Batch Upload</a>

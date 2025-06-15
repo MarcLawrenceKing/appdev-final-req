@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using appdev_final_req.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace appdev_final_req.Controllers
 {
+    [Authorize] // Protect the whole controller
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
