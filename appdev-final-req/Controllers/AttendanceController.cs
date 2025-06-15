@@ -16,10 +16,21 @@ namespace appdev_final_req.Controllers
         }
 
         // lists all events record
-        public async Task<IActionResult> List()
+        [HttpGet]
+        public async Task<IActionResult> List(string search)
         {
-            var events = await dbContext.Events.ToListAsync();
-            return View(events);
+            var events = dbContext.Events.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                events = events.Where(e =>
+                    e.Title.ToLower().Contains(search.ToLower()) ||
+                    e.EventDate.ToString().Contains(search)
+                );
+            }
+
+            var result = await events.ToListAsync();
+            return View(result);
         }
 
         // lists attendance forms and existing records
