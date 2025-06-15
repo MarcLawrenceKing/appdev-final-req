@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace appdev_final_req.Controllers
 {
-    [Authorize] // Protect the whole controller
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -16,6 +16,12 @@ namespace appdev_final_req.Controllers
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult Dashboard()
         {
             return View();
         }

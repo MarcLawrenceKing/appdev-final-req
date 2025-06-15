@@ -91,9 +91,9 @@
                         <br><br>
                         No more lost records or time wasted—we help you focus on productivity, not paperwork. Our user-friendly platform makes attendance tracking accessible anytime, anywhere.
                     </p>
-                    <div class="mt-4">
-                        <a href="#" class="btn btn-outline-primary btn-custom">Log In</a>
-                        <a href="#" class="btn btn-outline-primary btn-custom">Sign Up</a>
+                    <div class="mt-4">                        
+                        <a asp-controller="Users" asp-action="Register" class="btn btn-outline-primary btn-custom">Register</a>
+                        <a asp-controller="Users" asp-action="Login" class="btn btn-outline-primary btn-custom">Login</a>                        
                     </div>
                 </div>
             </div>
@@ -110,13 +110,5 @@
 </body>
 </html>
 
-<div class="text-center">
-    <h1 class="display-4">ATTENDANCE MO 'TO</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core!!</a>.</p>
-    <p>Impeach Sara Now</p>
-    <form asp-controller="Users" asp-action="Logout" method="post" class="d-inline">
-        @Html.AntiForgeryToken()
-        <button type="submit" class="btn btn-link nav-link" style="border: none; padding: 0; background: none;">Logout</button>
-    </form>
-</div>
+
 
