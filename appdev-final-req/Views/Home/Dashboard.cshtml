@@ -1,9 +1,232 @@
-﻿<div class="text-center">
-    <h1 class="display-4">ATTENDANCE MO 'TO</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core!!</a>.</p>
-    <p>Impeach Sara Now</p>
-    <form asp-controller="Users" asp-action="Logout" method="post" class="text-center">
-        @Html.AntiForgeryToken()
-        <button type="submit" class="btn btn-link nav-link" style="border: none; padding: 0; background: none;">Logout</button>
-    </form>
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+<h1 style="text-align: center; font-family: 'Verdana'">@ViewData["Title"]</h1>
+
+@model appdev_final_req.Models.DashboardViewModel
+
+<style>
+    /* custom style to bold number list*/
+    .bold-numbers > li::before {
+        font-weight: bold;
+    }
+</style>
+
+<p style="text-align: center;">
+    System features, Set up instructions, and Real-time analytics.
+</p>
+<div class="d-flex justify-content-center gap-5">
+    <div class="card mt-4" style="width: 30rem;">
+        <div class="card-header text-center fw-bold">Instructions</div>
+        <ol class="list-group list-group-numbered list-group-flush bold-numbers text-justify">
+            <li class="list-group-item">
+                <strong>
+                    Register or Log In
+                </strong> <br />
+                Create a new account or log in with your existing credentials to access the system.
+            </li>
+            <li class="list-group-item">
+                <strong>
+                    Import Members
+                </strong> <br />
+                Navigate to the Members tab and use the batch import feature to upload your list of members.
+            </li>
+            <li class="list-group-item">
+                <strong>
+                    Create an Event
+                </strong> <br />
+                Go to the Events tab and add a new event. Specify the event name, date, and any relevant details.
+            </li>
+            <li class="list-group-item">
+                <strong>
+                    Open the Attendance Tab
+                </strong> <br />
+                In the Attendance section, find and select the event you created.
+            </li>
+            <li class="list-group-item">
+                <strong>
+                    Mark Attendance
+                </strong> <br />
+                You'll see the full list of members for the selected event. Check the box beside each name, then click save attendance to update their attendance.
+            </li>
+        </ol>
+    </div>
+    
+    <div class="card mt-4" style="width: 30rem;">
+        <div class="card-header text-center fw-bold">
+            🌟 System Features Overview
+        </div>
+        <ol class="list-group list-group-flush">
+            <li class="list-group-item">
+                <strong>
+                    🎨 User Interface
+                </strong> <br />
+                <p class="mt-2">
+                    <span class="fw-medium">Light/Dark Mode Toggle:</span> Easily switch between light and dark themes based on your preference.<br />
+                    <span class="fw-medium">Responsive Layout:</span> Looks good with any screen size.
+                </p>
+                
+            </li>
+            <li class="list-group-item">
+                <strong>
+                    📊 Dashboard Overview 
+                </strong> <br />
+                <p class="mt-2">
+                    <span class="fw-medium">Live Analytics:</span>  Gain insights based on members, events, and attendance data
+                </p>
+            </li>           
+        </ol>
+    </div>
 </div>
+
+<h2 class="mb-4">Members</h2>
+<div class="row g-4">
+    <!-- MEMBERS -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Total Members</h6>
+                <h4 class="mb-0">@Model.TotalMembers</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Active Members</h6>
+                <h4 class="mb-0">@Model.ActiveMembers</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Inactive Members</h6>
+                <h4 class="mb-0">@Model.InactiveMembers</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">New Members This Month</h6>
+                <h4 class="mb-0">@Model.NewMembersThisMonth</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Engaged Members (>50%)</h6>
+                <h4 class="mb-0">@Model.EngagedMembersOver50Percent</h4>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<h2 class="mb-4">Events</h2>
+<div class="row g-4">
+    <!-- EVENTS -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Total Events</h6>
+                <h4 class="mb-0">@Model.TotalEvents</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Events This Month</h6>
+                <h4 class="mb-0">@Model.EventsThisMonth</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Avg. Attendance per Event</h6>
+                <h4 class="mb-0">@Model.AverageAttendancePerEvent</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Most Attended Event</h6>
+                <h4 class="mb-0">@Model.MostAttendedEventTitle</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Least Attended Event</h6>
+                <h4 class="mb-0">@Model.LowestAttendedEventTitle</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">No-Show Rate</h6>
+                <h4 class="mb-0">@Model.NoShowRate.ToString("0.0")%</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="mb-4">Attendance</h2>
+<div class="row g-4">
+    <!-- ATTENDANCE -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Total Attendance Records</h6>
+                <h4 class="mb-0">@Model.TotalAttendanceRecords</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Monthly Attendance Rate</h6>
+                <h4 class="mb-0">@Model.MonthlyAttendanceRate.ToString("0.0")%</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Low-Participation Members</h6>
+                <h4 class="mb-0">@Model.LowParticipationMembers</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm p-3">
+            <div class="text-start">
+                <h6 class="mb-2 text-muted">Avg. Attendance Rate</h6>
+                <h4 class="mb-0">@Model.AverageAttendanceRate.ToString("0.0")%</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
