@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Text;
 using appdev_final_req.Data;
 using appdev_final_req.Models;
@@ -34,100 +35,83 @@ namespace appdev_final_req.Controllers
         [Authorize]
         public async Task<IActionResult> Dashboard()
         {
-            // now: Gets the current date and time.
-            // startOfMonth: Sets a date to the first day of the current month(e.g., June 1, 2025).
-            var now = DateTime.Now;
-            var startOfMonth = new DateOnly(now.Year, now.Month, 1);
+            // Converts DateTime.Today (which has time) to DateOnly, which stores just the date.
+            var today = DateOnly.FromDateTime(DateTime.Today);
 
-            // Fetches all members, and events and their related attendance records using Include.
+            // Asynchronously fetches all rows from each table (Members, Events, Attendance)
             var members = await dbContext.Members.ToListAsync();
-            var events = await dbContext.Events.Include(e => e.Attendances).ToListAsync();
+            var events = await dbContext.Events.ToListAsync();
+            var attendance = await dbContext.Attendance.ToListAsync();
 
-            // Fetches all attendance rows 
-            var attendances = await dbContext.Attendance
-                .Include(a => a.Event) // Include Event so you can access Event.Date (join)
-                .ToListAsync();
+            // Counts the total number of members.
+            // Counts how many members are marked as active (IsActive == true).
+            var totalMembers = members.Count;
+            var activeMembers = members.Count(m => m.IsActive);
 
-            // Total members
-            // Members marked as active
-            // Members added this month(assuming CreatedAt is a valid date field)
-            int totalMembers = members.Count;
-            int activeMembers = members.Count(m => m.IsActive);
-            int newMembersThisMonth = members.Count(m => m.DateJoined >= startOfMonth);
+            // Checks if there are any members.
+            // If yes, it computes average age using DateOnly logic:
+            // today.Year - m.Birthdate.Year gives rough age.
+            // Subtracts 1 if the member hasn't had their birthday this year yet.
+            // If there are no members, returns 0
 
-            // Event totals and number of attendance records
-            int totalEvents = events.Count;
-            int eventsThisMonth = events.Count(e => e.EventDate >= startOfMonth);
-            int totalAttendanceRecords = attendances.Count;
+            var avgAge = members.Any()
+                ? members.Average(m => (today.Year - m.Birthdate.Year - (m.Birthdate > today.AddYears(-(today.Year - m.Birthdate.Year)) ? 1 : 0)))
+                : 0;
 
-            // Calculates average attendees per event
-            // Finds the event with the most and least attendance
-            var averageAttendancePerEvent = totalEvents == 0 ? 0 : events.Average(e => e.Attendances.Count);
-            var mostAttendedEvent = events.OrderByDescending(e => e.Attendances.Count).FirstOrDefault();
-            var leastAttendedEvent = events.OrderBy(e => e.Attendances.Count).FirstOrDefault();
+            // Counts the total number of events.
+            // Counts events scheduled after today.
+            // Counts events that are before today.
+            var totalEvents = events.Count;
+            var upcomingEvents = events.Count(e => e.EventDate > today);
+            var pastEvents = events.Count(e => e.EventDate < today);
 
-            // Percentage of absentees across all attendance records
-            double noShowRate = totalAttendanceRecords == 0
-                ? 0
-                : (double)attendances.Count(a => !a.IsPresent) / totalAttendanceRecords * 100;
+            // Get only past and current events
+            var validEvents = events.Where(e => e.EventDate <= today).ToList();
 
-            // Gets attendance records for the current month 
-            var monthlyAttendances = attendances.Where(a => a.Event.EventDate >= startOfMonth).ToList();
+            // Get valid event IDs
+            var validEventIds = validEvents.Select(e => e.Id).ToHashSet();
 
-            // Calculates the total possible attendance = total members × total monthly events (assuming everyone is expected to attend each)
-            var totalPossible = events
-                .Where(e => e.EventDate >= startOfMonth)
-                .Sum(e => members.Count); // assuming all members are expected
+            // Filter attendance for only valid events
+            var validAttendance = attendance.Where(a => validEventIds.Contains(a.EventId)).ToList();
 
-            // The actual attendance rate for this month
-            double monthlyAttendanceRate = totalPossible == 0 ? 0 :
-                (double)monthlyAttendances.Count(a => a.IsPresent) / totalPossible * 100;
+            // Assumes each member should attend every event.
+            // Computes expected total attendance records
+            var totalAttendanceRecords = validEvents.Count * totalMembers;
 
-            // Members with >50% attendance (engaged)
-            int engagedMembers = members.Count(m =>
-            {
-                var memberAttendances = attendances.Where(a => a.MemberId == m.Id).ToList();
-                int attended = memberAttendances.Count(a => a.IsPresent);
-                return memberAttendances.Count > 0 && ((double)attended / memberAttendances.Count) > 0.5;
-            });
+            // Counts how many members were marked present in the attendance records.
+            var totalPresent = validAttendance.Count(a => a.IsPresent);
 
-            // Members with <50% attendance (low participation)
-            int lowParticipation = members.Count(m =>
-            {
-                var memberAttendances = attendances.Where(a => a.MemberId == m.Id).ToList();
-                int attended = memberAttendances.Count(a => a.IsPresent);
-                return memberAttendances.Count > 0 && ((double)attended / memberAttendances.Count) < 0.5;
-            });
+            // Calculates average number of attendees per event:
+            // Groups present attendance by EventId.
+            // Averages the group sizes.
+            // If there are no events, returns 0.
+            var attendancePerEvent = validEvents.Count > 0
+                ? validAttendance.Where(a => a.IsPresent).GroupBy(a => a.EventId).Average(g => g.Count())
+                : 0;
 
-            // Calculates the average attendance rate per event, then averages those rates
-            double averageAttendanceRate = events.Count == 0 ? 0 :
-                events.Average(e =>
-                {
-                    int count = e.Attendances.Count;
-                    int present = e.Attendances.Count(a => a.IsPresent);
-                    return count == 0 ? 0 : (double)present / count * 100;
-                });
+            // Calculates the overall attendance rate:
+            // Present count ÷ expected attendance records.
+            // Returns 0 if there are no expected records to avoid division by zero.
+            var overallAttendanceRate = totalAttendanceRecords > 0
+                ? (double)totalPresent / totalAttendanceRecords
+                : 0;
 
             var viewModel = new DashboardViewModel
             {
+                today = today,
                 TotalMembers = totalMembers,
                 ActiveMembers = activeMembers,
-                InactiveMembers = totalMembers - activeMembers,
-                NewMembersThisMonth = newMembersThisMonth,
-                EngagedMembersOver50Percent = engagedMembers,
+                AverageMemberAge = Math.Round(avgAge, 2),
 
                 TotalEvents = totalEvents,
-                EventsThisMonth = eventsThisMonth,
-                AverageAttendancePerEvent = Math.Round(averageAttendancePerEvent, 1),
-                MostAttendedEventTitle = mostAttendedEvent?.Title ?? "N/A",
-                LowestAttendedEventTitle = leastAttendedEvent?.Title ?? "N/A",
-                NoShowRate = Math.Round(noShowRate, 1),
+                UpcomingEvents = upcomingEvents,
+                PastEvents = pastEvents,
 
                 TotalAttendanceRecords = totalAttendanceRecords,
-                MonthlyAttendanceRate = Math.Round(monthlyAttendanceRate, 1),
-                LowParticipationMembers = lowParticipation,
-                AverageAttendanceRate = Math.Round(averageAttendanceRate, 1)
+                AverageAttendancePerEvent = Math.Round(attendancePerEvent, 2),
+                OverallAttendanceRate = Math.Round(overallAttendanceRate * 100, 2) // In percent
             };
+
             return View(viewModel);
         }
 

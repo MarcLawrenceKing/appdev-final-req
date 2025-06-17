@@ -2,26 +2,20 @@
 {
     public class DashboardViewModel
     {
+        public DateOnly today { get; set; }
         // Members KPIs
         public int TotalMembers { get; set; }
         public int ActiveMembers { get; set; }
-        public int InactiveMembers { get; set; }
-        public int NewMembersThisMonth { get; set; }
-        public int EngagedMembersOver50Percent { get; set; }
-        public double ActiveMemberPercentage => TotalMembers == 0 ? 0 : (double)ActiveMembers / TotalMembers * 100;
+        public double AverageMemberAge { get; set; }
 
         // Events KPIs
         public int TotalEvents { get; set; }
-        public int EventsThisMonth { get; set; }
-        public double AverageAttendancePerEvent { get; set; }
-        public string MostAttendedEventTitle { get; set; }
-        public string LowestAttendedEventTitle { get; set; }
-        public double NoShowRate { get; set; }
+        public int UpcomingEvents { get; set; }
+        public int PastEvents { get; set; }
 
         // Attendance KPIs
         public int TotalAttendanceRecords { get; set; }
-        public double MonthlyAttendanceRate { get; set; }
-        public int LowParticipationMembers { get; set; }
-        public double AverageAttendanceRate { get; set; }
+        public double AverageAttendancePerEvent { get; set; }
+        public double OverallAttendanceRate { get; set; }
     }
 }
