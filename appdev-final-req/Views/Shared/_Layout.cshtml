@@ -76,7 +76,7 @@
             </div>
         </nav>
     </header>
-    <div class="container-fluid flex-fill d-flex flex-column g-0">
+    <div class="@(ViewBag.HomeLayout == true ? "container-fluid g-0 flex-fill d-flex flex-column" : "container flex-fill d-flex flex-column")">
         <main role="main" class="pb-3 flex-fill">
             @RenderBody()
         </main>

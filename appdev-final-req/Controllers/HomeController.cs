@@ -85,12 +85,25 @@ namespace appdev_final_req.Controllers
             // Groups present attendance by EventId.
             // Averages the group sizes.
             // If there are no events, returns 0.
-            var attendancePerEvent = validEvents.Count > 0
-                ? validAttendance.Where(a => a.IsPresent).GroupBy(a => a.EventId).Average(g => g.Count())
-                : 0;
+            // var attendancePerEvent = validEvents.Count > 0
+            //     ? validAttendance.Where(a => a.IsPresent).GroupBy(a => a.EventId).Average(g => g.Count())
+            //     : 0;
+
+            // pinalitan ko ung above code kasi may error sa validEvents.Count > 0
+            // It was trying to access a property on a null object.
+            double attendancePerEvent = 0;
+            var groupedAttendance = validAttendance
+                .Where(a => a.IsPresent)
+                .GroupBy(a => a.EventId)
+                .ToList();
+
+            if (groupedAttendance.Any())
+            {
+                attendancePerEvent = groupedAttendance.Average(g => g.Count());
+            }
 
             // Calculates the overall attendance rate:
-            // Present count ÷ expected attendance records.
+            // Present count ï¿½ expected attendance records.
             // Returns 0 if there are no expected records to avoid division by zero.
             var overallAttendanceRate = totalAttendanceRecords > 0
                 ? (double)totalPresent / totalAttendanceRecords
