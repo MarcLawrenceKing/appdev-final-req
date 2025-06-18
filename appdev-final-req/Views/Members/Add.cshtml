@@ -95,8 +95,9 @@
             <label class="form-label">Birthdate</label>
             <input type="date" class="form-control" asp-for="Birthdate" required />
         </div>
-        <div class="mt-4 text-center">
-            <button type="submit" class="btn btn-primary px-4 py-2">Save</button>
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-success px-4 py-2">Save</button>
+            <a asp-controller="Members" asp-action="List" class="btn btn-primary px-4 py-2">Back</a>
         </div>
     </form>
 </div>

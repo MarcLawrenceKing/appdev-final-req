@@ -1,16 +1,15 @@
 ﻿@{
     ViewData["Title"] = "Members List";
 }
-<h1 style="text-align: center;  font-family: 'Verdana'">@ViewData["Title"]</h1>
+<h1 style="text-align: center; font-family: 'Poppins', sans-serif">📋 Member List</h1>
 
 @model List<appdev_final_req.Models.Entitiess.Member>
 
-<p style="text-align: center;">Add, Search, Edit, Delete, or Upload members here.</p>
+<p style="text-align: center; font-family: 'Poppins', sans-serif">Add, Search, Edit, Delete, or Upload members here.</p>
 <div class="">
     <div class="d-flex justify-content-end">
         <a class="btn btn-success me-3" asp-controller="Members" asp-action="BatchUpload">Batch Upload</a>
         <a class="btn btn-primary" asp-controller="Members" asp-action="Add">Add Member</a>
-        
     </div>
     <form class="d-flex mt-4" role="search" method="get" asp-action="List">
         <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
@@ -22,9 +21,8 @@
         <div class="alert alert-success mt-3">@TempData["Message"]</div>
     }
 
-
-    <table class="table mt-4" id="membersTable">
-        <thead>
+    <table class="table table-bordered border-primary rounded-2 mt-4" id="membersTable" style="font-family: 'Poppins', sans-serif">
+        <thead class="table-primary">
             <tr>
                 <th><input type="checkbox" id="selectAll" /></th>
                 <th scope="col" onclick="sortTable(1)">
@@ -84,7 +82,6 @@
             Delete Selected
         </button>
     </form>
-
 </div>
 
 @section Scripts {
@@ -102,7 +99,6 @@
             const tbody = table.tBodies[0];
             const rows = Array.from(tbody.rows);
 
-            // Toggle direction
             sortDirection[columnIndex] = !sortDirection[columnIndex];
 
             rows.sort((a, b) => {
@@ -110,35 +106,24 @@
                 const bText = b.cells[columnIndex].textContent.trim().toLowerCase();
 
                 if (!isNaN(Date.parse(aText)) && !isNaN(Date.parse(bText))) {
-                    return sortDirection[columnIndex]
-                        ? new Date(aText) - new Date(bText)
-                        : new Date(bText) - new Date(aText);
+                    return sortDirection[columnIndex] ? new Date(aText) - new Date(bText) : new Date(bText) - new Date(aText);
                 }
 
                 if (!isNaN(aText) && !isNaN(bText)) {
-                    return sortDirection[columnIndex]
-                        ? aText - bText
-                        : bText - aText;
+                    return sortDirection[columnIndex] ? aText - bText : bText - aText;
                 }
 
-                return sortDirection[columnIndex]
-                    ? aText.localeCompare(bText)
-                    : bText.localeCompare(aText);
+                return sortDirection[columnIndex] ? aText.localeCompare(bText) : bText.localeCompare(aText);
             });
 
             rows.forEach(row => tbody.appendChild(row));
 
-            // Clear old icons
             if (lastSortedCol && lastSortedCol !== columnIndex) {
                 const oldIcon = document.getElementById(`sortIcon${lastSortedCol}`);
                 if (oldIcon) oldIcon.innerHTML = '';
             }
 
-            // Set new icon
-            const icon = sortDirection[columnIndex]
-                ? '<i class="bi bi-caret-up-fill"></i>'
-                : '<i class="bi bi-caret-down-fill"></i>';
-
+            const icon = sortDirection[columnIndex] ? '<i class="bi bi-caret-up-fill"></i>' : '<i class="bi bi-caret-down-fill"></i>';
             const iconSpan = document.getElementById(`sortIcon${columnIndex}`);
             if (iconSpan) iconSpan.innerHTML = icon;
 
