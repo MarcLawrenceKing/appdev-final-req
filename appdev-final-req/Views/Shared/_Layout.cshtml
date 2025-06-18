@@ -25,7 +25,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand ms-3" asp-area="" asp-controller="Home" asp-action="Index">Attendance Mo 'To</a>
+                <a class="navbar-brand ms-3" asp-area="" asp-controller="Home" asp-action="Dashboard">Attendance Mo 'To</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                 aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -47,25 +47,36 @@
                                 <a class="nav-link" asp-area="" asp-controller="Attendance" asp-action="List">Attendance</a>
                             </li>
                         }
-                        
+
                     </ul>
                     <!-- Right-aligned Light/Dark toggle -->
-                    <div class="d-flex align-items-center ms-auto">
-                        <label class="form-check-label me-2" for="flexSwitchCheckChecked">Light/Dark Mode</label>
-                        <div class="form-switch">
-                            <input class="form-check-input p-2"
-                                   type="checkbox"
-                                   role="switch"
-                                   id="flexSwitchCheckChecked"
-                                   checked
-                                   onclick="myFunction()" />
+                    <div class="d-flex align-items-center gap-3 me-3">
+                        <div class="d-flex align-items-center ms-auto">
+                            <label class="form-check-label me-2" for="flexSwitchCheckChecked">Light/Dark Mode</label>
+                            <div class="form-switch">
+                                <input class="form-check-input p-2"
+                                       type="checkbox"
+                                       role="switch"
+                                       id="flexSwitchCheckChecked"
+                                       checked
+                                       onclick="myFunction()" />
+                            </div>
                         </div>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form asp-controller="Users" asp-action="Logout" method="post" class="text-center">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn nav-link" style="border: none; padding: 0; background: none;">Logout</button>
+                            </form>
+                        }
                     </div>
+                    
+                    
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container flex-fill d-flex flex-column">
+    <div class="@(ViewBag.HomeLayout == true ? "container-fluid g-0 flex-fill d-flex flex-column" : "container flex-fill d-flex flex-column")">
         <main role="main" class="pb-3 flex-fill">
             @RenderBody()
         </main>
