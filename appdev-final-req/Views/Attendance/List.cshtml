@@ -1,24 +1,29 @@
 ﻿@{
-    ViewData["Title"] = "Attendance List";
+    ViewData["Title"] = "📒Attendance List";
 }
-<h1 style="text-align: center; font-family: 'Verdana'">@ViewData["Title"]</h1>
-
 @model List<appdev_final_req.Models.Entitiess.Event>
 
-<p style="text-align: center;">Mark members' attendance according to events here.</p>
+<!-- Poppins & Bootstrap -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+<h1 style="text-align: center; font-family: 'Poppins', sans-serif">@ViewData["Title"]</h1>
+<p style="text-align: center; font-family: 'Poppins', sans-serif;">Mark members' attendance according to events here.</p>
+
 <div class="">
-
-    <form class="d-flex mt-4" role="search" method="get" asp-action="List">
-        <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
-        <button class="btn btn-outline-primary" type="submit">Search</button>
-    </form>
-
-    <table class="table mt-4">
-        <thead>
-            <tr>               
-                <th scope="col">Event Title</th>
-                <th scope="col">Event Date</th>
-                <th scope="col" class="text-center">View Attendance</th>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form class="d-flex" role="search" method="get" asp-action="List">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
+            <button class="btn btn-outline-primary" type="submit">🔍</button>
+        </form>
+    </div>
+    <table class="table table-bordered border-primary rounded-2 mt-4" style="font-family: 'Poppins', sans-serif;">
+        <thead class="table-primary">
+            <tr>
+                <th>Event Title</th>
+                <th>Event Date</th>
+                <th class="text-center">View File</th>
             </tr>
         </thead>
         <tbody>
@@ -26,14 +31,14 @@
             {
                 <tr>
                     <td>@eventz.Title</td>
-                    <td>@eventz.EventDate</td>
+                    <td>@eventz.EventDate.ToString("MMMM dd, yyyy")</td>
                     <td class="text-center">
-                        <a class="btn btn-primary" asp-controller="Attendance" asp-action="MarkAttendance" asp-route-id="@eventz.Id"> <i class="bi bi-list-check"></i></a>
+                        <a class="btn btn-primary btn-sm" asp-controller="Attendance" asp-action="MarkAttendance" asp-route-id="@eventz.Id">
+                            📋
+                        </a>
                     </td>
                 </tr>
             }
-
-
         </tbody>
     </table>
 </div>
