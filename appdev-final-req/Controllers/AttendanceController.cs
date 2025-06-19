@@ -35,22 +35,28 @@ namespace appdev_final_req.Controllers
             return View(result);
         }
 
-        // lists attendance forms and existing records
         [HttpGet]
-        public async Task<IActionResult> MarkAttendance(int id)
+        public async Task<IActionResult> MarkAttendance(int id, string? search)
         {
             var eventInfo = await dbContext.Events.FindAsync(id);
             if (eventInfo == null) return NotFound();
 
-            var members = await dbContext.Members.ToListAsync();
+            var membersQuery = dbContext.Members.AsQueryable();
 
-            // list all existing attendance records for an event
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.ToLower();
+                membersQuery = membersQuery.Where(m =>
+                    m.FullName.ToLower().Contains(search) ||
+                    m.Id.ToString().Contains(search)
+                );
+            }
+
+            var members = await membersQuery.ToListAsync();
+
             var existing = await dbContext.Attendance
                 .Where(a => a.EventId == id)
                 .ToListAsync();
-
-            // this prepares the list of members you will show on the page
-            // go through each member, get id and name and compare it with existing list member id, if found, then member isPresent becomes true
 
             var viewModel = members.Select(m => new AttendanceViewModel
             {
@@ -59,12 +65,13 @@ namespace appdev_final_req.Controllers
                 IsPresent = existing.FirstOrDefault(a => a.MemberId == m.Id)?.IsPresent ?? false
             }).ToList();
 
-            // save the event id and title to be displayed on the html 
             ViewBag.EventId = id;
             ViewBag.EventTitle = eventInfo.Title;
+            ViewBag.Saved = false;
 
             return View(viewModel);
         }
+
 
         // this is the method when an attendance form is submitted, it takes the event id, and the list of updated attendance
         public async Task<IActionResult> MarkAttendance(int eventId, List<AttendanceViewModel> attendanceList)

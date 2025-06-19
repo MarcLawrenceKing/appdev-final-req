@@ -65,11 +65,11 @@
         </form>
     </div>
 
-    <table class="table table-bordered rounded-2 mt-4">
+    <table class="table table-bordered rounded-2 mt-4" id="eventsTable">
         <thead>
             <tr>
-                <th>Event Title</th>
-                <th>Event Date</th>
+                <th onclick="sortEventsTable(0)">Event Title <span id="eventSortIcon0" class="sort-icon"></span></th>
+                <th onclick="sortEventsTable(1)">Event Date <span id="eventSortIcon1" class="sort-icon"></span></th>
                 <th class="text-center">View File</th>
             </tr>
         </thead>
@@ -89,3 +89,46 @@
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        let eventSortDir = {};
+        let lastSortedEventCol = null;
+
+        function sortEventsTable(colIndex) {
+            const table = document.getElementById("eventsTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            eventSortDir[colIndex] = !eventSortDir[colIndex];
+
+            rows.sort((a, b) => {
+                const aText = a.cells[colIndex].textContent.trim().toLowerCase();
+                const bText = b.cells[colIndex].textContent.trim().toLowerCase();
+
+                // Sort as dates if column is Event Date
+                if (colIndex === 1 && !isNaN(Date.parse(aText)) && !isNaN(Date.parse(bText))) {
+                    return eventSortDir[colIndex]
+                        ? new Date(aText) - new Date(bText)
+                        : new Date(bText) - new Date(aText);
+                }
+
+                return eventSortDir[colIndex]
+                    ? aText.localeCompare(bText)
+                    : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            if (lastSortedEventCol !== null && lastSortedEventCol !== colIndex) {
+                document.getElementById(`eventSortIcon${lastSortedEventCol}`).innerHTML = '';
+            }
+
+            document.getElementById(`eventSortIcon${colIndex}`).innerHTML = eventSortDir[colIndex]
+                ? '<i class="bi bi-caret-up-fill"></i>'
+                : '<i class="bi bi-caret-down-fill"></i>';
+
+            lastSortedEventCol = colIndex;
+        }
+    </script>
+}

@@ -89,24 +89,29 @@
 
 @if (!isSaved)
 {
-    <form asp-action="MarkAttendance" method="post">
-        <input type="hidden" name="eventId" value="@eventId" />
-
+    <!-- SEARCH FORM -->
+    <form asp-action="MarkAttendance" method="get" asp-route-id="@eventId">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="d-flex search-bar" role="search">
                 <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
                 <button class="btn btn-outline-primary" type="submit">🔍</button>
             </div>
         </div>
+    </form>
 
-        <table class="table table-bordered rounded-2 mt-2">
+    <!-- ATTENDANCE FORM -->
+    <form asp-action="MarkAttendance" method="post">
+        <input type="hidden" name="eventId" value="@eventId" />
+
+        <table class="table table-bordered rounded-2 mt-2" id="attendanceTable">
             <thead>
                 <tr>
-                    <th>Member ID</th>
-                    <th>Member</th>
-                    <th class="text-center">Present (✔️)</th>
+                    <th onclick="sortAttendanceTable(0)">Member ID <span id="sortIcon0" class="sort-icon"></span></th>
+                    <th onclick="sortAttendanceTable(1)">Member <span id="sortIcon1" class="sort-icon"></span></th>
+                    <th class="text-center" onclick="sortAttendanceTable(2)">Present (✔️) <span id="sortIcon2" class="sort-icon"></span></th>
                 </tr>
             </thead>
+
             <tbody>
                 @for (int i = 0; i < Model.Count; i++)
                 {
@@ -172,4 +177,52 @@ else
     <div class="mt-4 text-center">
         <a asp-controller="Attendance" asp-action="List" class="btn btn-secondary px-4 py-2">Back to Events</a>
     </div>
+}
+
+@section Scripts {
+    <script>
+        let sortDirectionAttendance = {};
+        let lastSortedAttendanceCol = null;
+
+        function sortAttendanceTable(colIndex) {
+            const table = document.getElementById("attendanceTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            sortDirectionAttendance[colIndex] = !sortDirectionAttendance[colIndex];
+
+            rows.sort((a, b) => {
+                if (colIndex === 2) {
+                    const aCheckbox = a.cells[colIndex].querySelector('input[type="checkbox"]');
+                    const bCheckbox = b.cells[colIndex].querySelector('input[type="checkbox"]');
+                    const aChecked = aCheckbox?.checked ? 1 : 0;
+                    const bChecked = bCheckbox?.checked ? 1 : 0;
+
+                    return sortDirectionAttendance[colIndex]
+                        ? bChecked - aChecked
+                        : aChecked - bChecked;
+                }
+
+                const aText = a.cells[colIndex].textContent.trim().toLowerCase();
+                const bText = b.cells[colIndex].textContent.trim().toLowerCase();
+                return sortDirectionAttendance[colIndex]
+                    ? aText.localeCompare(bText)
+                    : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            if (lastSortedAttendanceCol !== null && lastSortedAttendanceCol !== colIndex) {
+                const oldIcon = document.getElementById(`sortIcon${lastSortedAttendanceCol}`);
+                if (oldIcon) oldIcon.innerHTML = '';
+            }
+
+            const iconSpan = document.getElementById(`sortIcon${colIndex}`);
+            iconSpan.innerHTML = sortDirectionAttendance[colIndex]
+                ? '<i class="bi bi-caret-up-fill"></i>'
+                : '<i class="bi bi-caret-down-fill"></i>';
+
+            lastSortedAttendanceCol = colIndex;
+        }
+    </script>
 }
