@@ -1,51 +1,51 @@
 ﻿@{
-    ViewData["Title"] = "Members List";
+    ViewData["Title"] = "Members";
 }
-<h1 style="text-align: center; font-family: 'Poppins', sans-serif">📋 Member List</h1>
-
 @model List<appdev_final_req.Models.Entitiess.Member>
 
-<p style="text-align: center; font-family: 'Poppins', sans-serif">Add, Search, Edit, Delete, or Upload members here.</p>
-<div class="">
-    <div class="d-flex justify-content-end">
-        <a class="btn btn-success me-3" asp-controller="Members" asp-action="BatchUpload">Batch Upload</a>
-        <a class="btn btn-primary" asp-controller="Members" asp-action="Add">Add Member</a>
+<!-- Bootstrap & Poppins -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+<h1 style="text-align: center; font-family: 'Poppins', sans-serif">📋 Members</h1>
+
+<div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form class="d-flex" role="search" method="get" asp-action="List">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
+            <button class="btn btn-outline-primary" type="submit">🔍</button>
+        </form>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">📥 Import</button>
+            <a class="btn btn-primary" asp-controller="Members" asp-action="Add">➕ New</a>
+            <form asp-controller="Members" asp-action="DeleteSelected" method="post" id="deleteSelectedForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ids" id="selectedIdsInput" />
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete the selected members?')">
+                    🗑️ Delete
+                </button>
+            </form>
+        </div>
     </div>
-    <form class="d-flex mt-4" role="search" method="get" asp-action="List">
-        <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
-        <button class="btn btn-outline-primary" type="submit">Search</button>
-    </form>
 
     @if (TempData["Message"] != null)
     {
         <div class="alert alert-success mt-3">@TempData["Message"]</div>
     }
 
-    <table class="table table-bordered border-primary rounded-2 mt-4" id="membersTable" style="font-family: 'Poppins', sans-serif">
+    <table class="table table-bordered border-primary rounded-2 mt-2" id="membersTable" style="font-family: 'Poppins', sans-serif">
         <thead class="table-primary">
             <tr>
                 <th><input type="checkbox" id="selectAll" /></th>
-                <th scope="col" onclick="sortTable(1)">
-                    <div class="no-wrap">ID <span id="sortIcon1" class="sort-icon"></span></div>
-                </th>
-                <th scope="col" onclick="sortTable(2)">
-                    <div class="no-wrap">FullName <span id="sortIcon2" class="sort-icon"></span></div>
-                </th>
-                <th scope="col" onclick="sortTable(3)">
-                    <div class="no-wrap">Email <span id="sortIcon3" class="sort-icon"></span></div>
-                </th>
-                <th scope="col" onclick="sortTable(4)">
-                    <div class="no-wrap">Phone <span id="sortIcon4" class="sort-icon"></span></div>
-                </th>
-                <th scope="col" onclick="sortTable(5)">
-                    <div class="no-wrap">Birthdate <span id="sortIcon5" class="sort-icon"></span></div>
-                </th>
-                <th scope="col" onclick="sortTable(6)">
-                    <div class="no-wrap">isActive <span id="sortIcon6" class="sort-icon"></span></div>
-                </th>
-                <th scope="col" onclick="sortTable(7)">
-                    <div class="no-wrap">DateJoined <span id="sortIcon7" class="sort-icon"></span></div>
-                </th>
+                <th onclick="sortTable(1)">ID <span id="sortIcon1" class="sort-icon"></span></th>
+                <th onclick="sortTable(2)">FullName <span id="sortIcon2" class="sort-icon"></span></th>
+                <th onclick="sortTable(3)">Email <span id="sortIcon3" class="sort-icon"></span></th>
+                <th onclick="sortTable(4)">Phone <span id="sortIcon4" class="sort-icon"></span></th>
+                <th onclick="sortTable(5)">Birthdate <span id="sortIcon5" class="sort-icon"></span></th>
+                <th onclick="sortTable(6)">Active <span id="sortIcon6" class="sort-icon"></span></th>
+                <th onclick="sortTable(7)">Joined <span id="sortIcon7" class="sort-icon"></span></th>
                 <th class="text-center">Actions</th>
             </tr>
         </thead>
@@ -61,36 +61,62 @@
                     <td>@member.Birthdate</td>
                     <td>@member.IsActive</td>
                     <td>@member.DateJoined</td>
-                    <td class="d-flex justify-content-center gap-3">
-                        <a class="btn btn-primary" asp-controller="Members" asp-action="Edit" asp-route-id="@member.Id"><i class="bi bi-pencil-square"></i></a>
-                        <form asp-action="Delete" asp-route-id="@member.Id" method="post" onsubmit="return confirm('Are you sure you want to delete @member.FullName?');">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-trash3"></i>
-                            </button>
-                        </form>
+                    <td class="text-center">
+                        <a class="btn btn-primary btn-sm" asp-controller="Members" asp-action="Edit" asp-route-id="@member.Id">✏️</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+</div>
 
-    <form id="deleteSelectedForm" asp-controller="Members" asp-action="DeleteSelected" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="ids" id="selectedIdsInput" />
-        <button type="submit" class="btn btn-danger mt-3" onclick="return confirm('Are you sure you want to delete the selected members?')">
-            Delete Selected
-        </button>
-    </form>
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">📥 Import Members</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Members" asp-action="BatchUpload" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">CSV File</label>
+                        <input type="file" class="form-control" name="file" id="file" accept=".csv" required />
+                    </div>
+                    @* Popup message shown after upload *@
+                    @if (TempData["UploadMessage"] != null)
+                    {
+                        <div class="alert alert-info">@TempData["UploadMessage"]</div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
+        // Select all checkbox logic
         document.getElementById("selectAll").addEventListener("change", function () {
             const checkboxes = document.querySelectorAll(".row-checkbox");
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
 
+        // Delete selected logic
+        document.getElementById("deleteSelectedForm").addEventListener("submit", function (e) {
+            const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+            document.getElementById("selectedIdsInput").value = ids.join(",");
+        });
+
+        // Sorting logic
         let sortDirection = {};
         let lastSortedCol = null;
 
@@ -123,17 +149,22 @@
                 if (oldIcon) oldIcon.innerHTML = '';
             }
 
-            const icon = sortDirection[columnIndex] ? '<i class="bi bi-caret-up-fill"></i>' : '<i class="bi bi-caret-down-fill"></i>';
+            const icon = sortDirection[columnIndex]
+                ? '<i class="bi bi-caret-up-fill"></i>'
+                : '<i class="bi bi-caret-down-fill"></i>';
             const iconSpan = document.getElementById(`sortIcon${columnIndex}`);
             if (iconSpan) iconSpan.innerHTML = icon;
 
             lastSortedCol = columnIndex;
         }
 
-        document.getElementById("deleteSelectedForm").addEventListener("submit", function (e) {
-            const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
-            const ids = Array.from(checkedBoxes).map(cb => cb.value);
-            document.getElementById("selectedIdsInput").value = ids.join(",");
+        // Auto-reopen modal if UploadMessage exists
+        window.addEventListener("DOMContentLoaded", function () {
+            const hasUploadMessage = '@TempData["UploadMessage"]' !== '';
+            if (hasUploadMessage) {
+                const importModal = new bootstrap.Modal(document.getElementById("importModal"));
+                importModal.show();
+            }
         });
     </script>
 }
