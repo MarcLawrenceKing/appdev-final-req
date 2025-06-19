@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Event List";
+    ViewData["Title"] = "Events";
 }
 @model List<appdev_final_req.Models.Entitiess.Event>
 
@@ -11,6 +11,8 @@
         --link-color: #0d6efd;
         --text-color: #212529;
         --thead-bg: #d6eaff;
+        --table-header-bg: #e3f2fd;
+        --table-border: #dee2e6;
     }
 
     :root[data-bs-theme='dark'] {
@@ -19,29 +21,28 @@
         --border-color: #2a2a2a;
         --link-color: #6aa5f8;
         --text-color: #ffffff;
-        --thead-bg: #578fca;
+        --thead-bg: #2c3e50;
+        --table-header-bg: #2c3e50;
+        --table-border: #6aa5f8;
     }
 
-    body {
-        background-color: var(--page-bg);
+    .table {
+        background-color: var(--card-bg);
         color: var(--text-color);
-        font-family: 'Poppins', sans-serif;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        border: 1px solid var(--table-border);
     }
 
-    table {
+    .table th {
+        background-color: var(--table-header-bg);
         color: var(--text-color);
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--table-border);
     }
 
-    thead th {
-        background-color: var(--thead-bg) !important;
-        color: var(--text-color) !important;
-        font-weight: 600;
-        vertical-align: middle;
-        white-space: nowrap;
+    .table td {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
     }
-
 
     .form-control,
     .form-control:focus {

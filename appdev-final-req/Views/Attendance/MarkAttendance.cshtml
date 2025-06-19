@@ -8,18 +8,75 @@
     bool isSaved = ViewBag.Saved ?? false;
 }
 
-<!-- Poppins & Bootstrap -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-
 <style>
+    :root[data-bs-theme='light'] {
+        --page-bg: #ffffff;
+        --text-color: #212529;
+        --card-bg: #ffffff;
+        --table-header-bg: #e3f2fd;
+        --table-border: #dee2e6;
+        --success: #d1e7dd;
+        --danger: #f8d7da;
+    }
+
+    :root[data-bs-theme='dark'] {
+        --page-bg: #212529;
+        --text-color: #ffffff;
+        --card-bg: #1e1e2f;
+        --table-header-bg: #2c3e50;
+        --table-border: #6aa5f8;
+        --success: #1e3e30;
+        --danger: #4a1e1e;
+    }
+
     body {
         font-family: 'Poppins', sans-serif;
+        background-color: var(--page-bg);
+        color: var(--text-color);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1, p {
+        text-align: center;
+    }
+
+    .table {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table th {
+        background-color: var(--table-header-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table td {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table-success th, .table-success td {
+        background-color: var(--success) !important;
+    }
+
+    .table-danger th, .table-danger td {
+        background-color: var(--danger) !important;
+    }
+
+    .form-control, .btn {
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .form-check-input.custom-check:checked {
-        background-color: #198754; /* green */
+        background-color: #198754;
         border-color: #198754;
+    }
+
+    .present-checkbox {
+        transform: scale(1.5);
     }
 
     .search-bar {
@@ -27,8 +84,8 @@
     }
 </style>
 
-<h1 style="text-align: center; font-family: 'Poppins', sans-serif">📝 Mark Attendance</h1>
-<p style="text-align: center;">Mark attendance for <strong>@ViewBag.EventTitle</strong></p>
+<h1>📝 Mark Attendance</h1>
+<p>Mark attendance for <strong>@ViewBag.EventTitle</strong></p>
 
 @if (!isSaved)
 {
@@ -42,8 +99,8 @@
             </div>
         </div>
 
-        <table class="table table-bordered border-primary rounded-2 mt-2" style="font-family: 'Poppins', sans-serif">
-            <thead class="table-primary">
+        <table class="table table-bordered rounded-2 mt-2">
+            <thead>
                 <tr>
                     <th>Member ID</th>
                     <th>Member</th>
@@ -59,7 +116,7 @@
                         <td>@item.FullName</td>
                         <td class="text-center">
                             <input type="hidden" name="attendanceList[@i].MemberId" value="@item.MemberId" />
-                            <input style="transform: scale(1.5);" class="form-check-input custom-check present-checkbox" type="checkbox" name="attendanceList[@i].IsPresent" value="true" @(item.IsPresent ? "checked" : "") />
+                            <input class="form-check-input custom-check present-checkbox" type="checkbox" name="attendanceList[@i].IsPresent" value="true" @(item.IsPresent ? "checked" : "") />
                         </td>
                     </tr>
                 }
@@ -75,8 +132,8 @@
 else
 {
     <h5 class="mt-4">✅ Present Members</h5>
-    <table class="table table-bordered border-success rounded-2 mt-2" style="font-family: 'Poppins', sans-serif">
-        <thead class="table-success">
+    <table class="table table-bordered table-success rounded-2 mt-2">
+        <thead>
             <tr>
                 <th>Member ID</th>
                 <th>Member</th>
@@ -94,8 +151,8 @@ else
     </table>
 
     <h5 class="mt-4">❌ Absent Members</h5>
-    <table class="table table-bordered border-danger rounded-2 mt-2" style="font-family: 'Poppins', sans-serif">
-        <thead class="table-danger">
+    <table class="table table-bordered table-danger rounded-2 mt-2">
+        <thead>
             <tr>
                 <th>Member ID</th>
                 <th>Member</th>
@@ -115,10 +172,4 @@ else
     <div class="mt-4 text-center">
         <a asp-controller="Attendance" asp-action="List" class="btn btn-secondary px-4 py-2">Back to Events</a>
     </div>
-}
-
-@section Scripts {
-    <script>
-        // No additional script needed for now
-    </script>
 }
