@@ -45,20 +45,40 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Dashboard">Dashboard</a>
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active fw-semibold" : "")"
+                                asp-area=""
+                                asp-controller="Home"
+                                asp-action="Dashboard">
+                                    Dashboard
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Members" asp-action="List">Members</a>
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Members" ? "active fw-semibold" : "")"
+                                asp-area=""
+                                asp-controller="Members"
+                                asp-action="List">
+                                    Members
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Events" asp-action="List">Events</a>
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Events" ? "active fw-semibold" : "")"
+                                asp-area=""
+                                asp-controller="Events"
+                                asp-action="List">
+                                    Events
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Attendance" asp-action="List">Attendance</a>
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Attendance" ? "active fw-semibold" : "")"
+                                asp-area=""
+                                asp-controller="Attendance"
+                                asp-action="List">
+                                    Attendance
+                                </a>
                             </li>
                         }
-
                     </ul>
+
                     <!-- Right-aligned Light/Dark toggle -->
                     <div class="d-flex align-items-center gap-3 me-3">
                         <div class="d-flex align-items-center ms-auto">
