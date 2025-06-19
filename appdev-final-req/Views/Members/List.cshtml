@@ -3,7 +3,76 @@
 }
 @model List<appdev_final_req.Models.Entitiess.Member>
 
-<h1 style="text-align: center;>📋 Members</h1>
+<style>
+    :root[data-bs-theme='light'] {
+        --page-bg: #ffffff;
+        --card-bg: #ffffff;
+        --border-color: #dee2e6;
+        --link-color: #0d6efd;
+        --text-color: #212529;
+        --thead-bg: #d6eaff;
+
+    }
+
+    :root[data-bs-theme='dark'] {
+        --page-bg: #212529;
+        --card-bg: #1e1e2f;
+        --border-color: #2a2a2a;
+        --link-color: #6aa5f8;
+        --text-color: #ffffff;
+        --thead-bg: #578fca;
+    }
+
+    body {
+        background-color: var(--page-bg);
+        color: var(--text-color);
+        font-family: 'Poppins', sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    table {
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+
+    thead th{
+        background-color: var(--thead-bg) !important;
+        color: var(--text-color);
+    }
+
+    .form-control,
+    .form-control:focus {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+
+    .modal-content {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+
+    .modal-header,
+    .modal-footer {
+        border-color: var(--border-color);
+    }
+
+    a {
+        color: var(--link-color);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--link-color);
+        color: #fff;
+    }
+
+    input[type="search"].form-control {
+        border: 1px solid #ccc !important;
+    }
+</style>
+
+<h1 class="text-center">📋 Members</h1>
 
 <div>
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -30,8 +99,8 @@
         <div class="alert alert-success mt-3">@TempData["Message"]</div>
     }
 
-    <table class="table table-bordered border-primary rounded-2 mt-2" id="membersTable" style="font-family: 'Poppins', sans-serif">
-        <thead class="table-primary">
+    <table class="table table-bordered border-primary rounded-2 mt-2" id="membersTable">
+        <thead>
             <tr>
                 <th><input type="checkbox" id="selectAll" /></th>
                 <th onclick="sortTable(1)">ID <span id="sortIcon1" class="sort-icon"></span></th>
@@ -79,7 +148,6 @@
                         <label for="file" class="form-label">CSV File</label>
                         <input type="file" class="form-control" name="file" id="file" accept=".csv" required />
                     </div>
-                    @* Popup message shown after upload *@
                     @if (TempData["UploadMessage"] != null)
                     {
                         <div class="alert alert-info">@TempData["UploadMessage"]</div>
