@@ -30,7 +30,7 @@ This app runs on **.NET 8** and can be developed using **Visual Studio 2022** (W
     - Choose the **ASP.NET and web development** workload.
 2. **Clone the Project**
     ```bash
-    git clone https://github.com/YourOrg/AttendanceMoTo.git
+    git clone https://github.com/MarcLawrenceKing/appdev-final-req.git
     cd AttendanceMoTo
     ```
 3. **Open `.sln` File**
@@ -62,7 +62,7 @@ This app runs on **.NET 8** and can be developed using **Visual Studio 2022** (W
 
 2. **Clone the Repo**
     ```bash
-    git clone https://github.com/YourOrg/AttendanceMoTo.git
+    git clone https://github.com/MarcLawrenceKing/appdev-final-req.git
     cd AttendanceMoTo
     ```
 
@@ -101,8 +101,8 @@ This app runs on **.NET 8** and can be developed using **Visual Studio 2022** (W
 ### 1. 🔐 Register & Login
 
 - Click **Register** → Create an account  
-- Confirm your email if required  
-- Login with your new credentials  
+- Click **Login** → With existing login credentials  
+- After registration, login with your new credentials  
 
 📷 *Registration Page*  
 
