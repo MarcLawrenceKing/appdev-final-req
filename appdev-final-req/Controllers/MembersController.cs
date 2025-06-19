@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using appdev_final_req.Models.Entitiess;
+using appdev_final_req.Models;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -31,18 +32,27 @@ public class MembersController : Controller
     }
 
     [HttpPost]
-    public IActionResult Add(Member member)
+    public IActionResult Add(AddMemberViewModel viewModel)
     {
         if (ModelState.IsValid)
         {
+            var member = new Member
+            {
+                FullName = viewModel.FullName,
+                Email = viewModel.Email,
+                Phone = viewModel.Phone,
+                Birthdate = viewModel.Birthdate
+            };
+
             _context.Members.Add(member);
             _context.SaveChanges();
             TempData["Message"] = "Member added successfully!";
             return RedirectToAction("List");
         }
 
-        return View(member);
+        return View(viewModel); // return same view model on error
     }
+
 
     public IActionResult Edit(int id)
     {

@@ -5,13 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsvHelper;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using CsvHelper.Configuration;
 
 namespace appdev_final_req.Controllers
 {
-    [Authorize] // Protect the whole controller
+    [Authorize]
     public class EventsController : Controller
     {
         private readonly ApplicationDbContext dbContext;
@@ -20,6 +19,7 @@ namespace appdev_final_req.Controllers
         {
             this.dbContext = dbContext;
         }
+
         [HttpGet]
         public async Task<IActionResult> List(string search)
         {
@@ -38,7 +38,6 @@ namespace appdev_final_req.Controllers
             return View(result);
         }
 
-
         [HttpGet]
         public IActionResult Add()
         {
@@ -53,10 +52,11 @@ namespace appdev_final_req.Controllers
                 Title = viewModel.Title,
                 Description = viewModel.Description,
                 EventDate = viewModel.EventDate,
-
             };
+
             await dbContext.Events.AddAsync(eventz);
             await dbContext.SaveChangesAsync();
+            TempData["Message"] = "Event added successfully!";
             return RedirectToAction("List");
         }
 
@@ -64,7 +64,7 @@ namespace appdev_final_req.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var eventz = await dbContext.Events.FindAsync(id);
-
+            if (eventz == null) return NotFound();
             return View(eventz);
         }
 
@@ -80,6 +80,7 @@ namespace appdev_final_req.Controllers
                 eventz.EventDate = viewModel.EventDate;
 
                 await dbContext.SaveChangesAsync();
+                TempData["Message"] = "Event updated successfully!";
             }
 
             return RedirectToAction("List");
@@ -87,7 +88,7 @@ namespace appdev_final_req.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)  // Simplified parameter
+        public async Task<IActionResult> Delete(int id)
         {
             var eventz = await dbContext.Events.FindAsync(id);
 
@@ -95,56 +96,10 @@ namespace appdev_final_req.Controllers
             {
                 dbContext.Events.Remove(eventz);
                 await dbContext.SaveChangesAsync();
-                TempData["Message"] = "Event deleted successfully";
+                TempData["Message"] = "Event deleted successfully.";
             }
 
             return RedirectToAction("List");
-        }
-
-        [HttpGet]
-        public IActionResult BatchUpload()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> BatchUpload(IFormFile file)
-        {
-            try
-            {
-                if (file != null && file.Length > 0)
-                {
-                    using var reader = new StreamReader(file.OpenReadStream());
-
-                    var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
-                    {
-                        PrepareHeaderForMatch = args => args.Header.ToLower(),
-                        HeaderValidated = null,
-                        MissingFieldFound = null,
-                        BadDataFound = null,
-                    };
-
-                    using var csv = new CsvReader(reader, config);
-
-                    csv.Context.TypeConverterCache.AddConverter<DateOnly>(new DateOnlyConverter());
-
-                    var events = csv.GetRecords<Event>().ToList();
-
-                    dbContext.Events.AddRange(events);
-                    await dbContext.SaveChangesAsync();
-
-                    ViewBag.Message = $"{events.Count} events added successfully!";
-                    return View();
-                }
-
-                ViewBag.Message = "Please upload a valid CSV file.";
-                return View();
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Message = "An error occurred: " + ex.Message;
-                return View();
-            }
         }
 
         [HttpPost]
@@ -156,7 +111,7 @@ namespace appdev_final_req.Controllers
                 var idList = ids.Split(',').Select(id => int.Parse(id)).ToList();
 
                 var eventsToDelete = await dbContext.Events
-                    .Where(m => idList.Contains(m.Id))
+                    .Where(e => idList.Contains(e.Id))
                     .ToListAsync();
 
                 dbContext.Events.RemoveRange(eventsToDelete);
@@ -166,6 +121,46 @@ namespace appdev_final_req.Controllers
             }
 
             return RedirectToAction("List");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BatchUpload(IFormFile file)
+        {
+            try
+            {
+                if (file != null && file.Length > 0)
+                {
+                    using var reader = new StreamReader(file.OpenReadStream());
+
+                    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        PrepareHeaderForMatch = args => args.Header.ToLower(),
+                        HeaderValidated = null,
+                        MissingFieldFound = null,
+                        BadDataFound = null
+                    };
+
+                    using var csv = new CsvReader(reader, config);
+
+                    csv.Context.TypeConverterCache.AddConverter<DateOnly>(new DateOnlyConverter());
+
+                    var events = csv.GetRecords<Event>().ToList();
+
+                    dbContext.Events.AddRange(events);
+                    await dbContext.SaveChangesAsync();
+
+                    TempData["UploadMessage"] = $"{events.Count} events uploaded successfully!";
+                    return RedirectToAction("List");
+                }
+
+                TempData["UploadMessage"] = "Please upload a valid CSV file.";
+                return RedirectToAction("List");
+            }
+            catch (Exception ex)
+            {
+                TempData["UploadMessage"] = "Error uploading file: " + ex.Message;
+                return RedirectToAction("List");
+            }
         }
     }
 }
