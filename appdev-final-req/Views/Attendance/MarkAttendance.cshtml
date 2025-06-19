@@ -108,7 +108,11 @@
                 <tr>
                     <th onclick="sortAttendanceTable(0)">Member ID <span id="sortIcon0" class="sort-icon"></span></th>
                     <th onclick="sortAttendanceTable(1)">Member <span id="sortIcon1" class="sort-icon"></span></th>
-                    <th class="text-center" onclick="sortAttendanceTable(2)">Present (✔️) <span id="sortIcon2" class="sort-icon"></span></th>
+                    <th class="text-center" onclick="sortAttendanceTable(2)">
+                        Present (✔️)
+                        <span id="sortIcon2" class="sort-icon"></span>
+                        <input type="checkbox" id="selectAll" class="form-check-input ms-2" onclick="toggleAllCheckboxes(this)" />
+                    </th>
                 </tr>
             </thead>
 
@@ -223,6 +227,12 @@ else
                 : '<i class="bi bi-caret-down-fill"></i>';
 
             lastSortedAttendanceCol = colIndex;
+        }
+
+        // ✅ Select All Present checkbox toggle
+        function toggleAllCheckboxes(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('.present-checkbox');
+            checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
         }
     </script>
 }
