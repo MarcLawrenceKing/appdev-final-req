@@ -5,6 +5,7 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using appdev_final_req.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class MembersController : Controller
 {
@@ -62,17 +63,23 @@ public class MembersController : Controller
     }
 
     [HttpPost]
-    public IActionResult Edit(Member member)
+    public async Task<IActionResult> Edit(Member viewModel)
     {
-        if (ModelState.IsValid)
-        {
-            _context.Members.Update(member);
-            _context.SaveChanges();
-            TempData["Message"] = "Member updated successfully!";
-            return RedirectToAction("List");
-        }
+        var member = await _context.Members.FindAsync(viewModel.Id);
 
-        return View(member);
+        if (member is not null)
+        {
+            member.FullName = viewModel.FullName;
+            member.Email = viewModel.Email;
+            member.Phone = viewModel.Phone;
+            member.Birthdate = viewModel.Birthdate;
+
+            _context.Members.Update(member);
+            await _context.SaveChangesAsync();
+            TempData["Message"] = "Member updated successfully!";
+        }
+        
+        return RedirectToAction("List");
     }
 
     [HttpPost]
