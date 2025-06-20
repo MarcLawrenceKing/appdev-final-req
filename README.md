@@ -16,7 +16,7 @@ This app runs on **.NET 8** and can be developed using **Visual Studio 2022** (W
 | Requirement | Windows | macOS | Linux |
 |------------|---------|-------|-------|
 | [.NET SDK 8+](https://dotnet.microsoft.com/download) | ✅ | ✅ | ✅ |
-| [SQL Server (Express)](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) or [Azure SQL] | ✅ | ✅ | ✅ |
+| [SQL Server (Developer)](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) or [Azure SQL] | ✅ | ✅ | ✅ |
 | [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) | ✅ | ❌ | ❌ |
 | [Visual Studio Code](https://code.visualstudio.com/) | ✅ | ✅ | ✅ |
 | [EF Core CLI](https://learn.microsoft.com/en-us/ef/core/cli/dotnet) | ✅ | ✅ | ✅ |
