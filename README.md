@@ -122,7 +122,7 @@ The dashboard provides:
 - Overview of attendance logs  
 - Quick access to Members, Events, and Reports
 
-📷 * Dashboard*
+📷 *Dashboard*
 
 https://github.com/user-attachments/assets/f78dc9ef-0ebf-4379-86c2-99e3b7abd8c3
 
