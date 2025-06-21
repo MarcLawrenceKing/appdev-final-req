@@ -1,0 +1,122 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+@model appdev_final_req.Models.LoginViewModel
+<style>
+    :root[data-bs-theme='dark'] {
+        --form-bg: #1e1e2f;
+        --form-border: #578FCA;
+        --text-color: #ffffff;
+        --input-bg: #2c2c3d;
+        --link-color: #6aa5f8;
+    }
+
+    :root[data-bs-theme='light'] {
+        --form-bg: #ffffff;
+        --form-border: #0d6efd;
+        --text-color: #000000;
+        --input-bg: #ffffff;
+        --link-color: #0d6efd;
+    }
+
+    .form-container {
+        border: 2px solid var(--form-border);
+        border-radius: 10px;
+        background-color: var(--form-bg);
+        padding: 30px;
+        max-width: 420px;
+        margin: 100px auto;
+        color: var(--text-color);
+    }
+
+    .form-container label,
+    .form-container input,
+    .form-container h3 {
+        color: var(--text-color);
+    }
+
+    .form-control {
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        border: 1px solid #ccc;
+    }
+
+    .form-control:focus {
+        border-color: var(--form-border);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .btn-blue {
+        background-color: var(--form-border);
+        color: white;
+        border: none;
+    }
+
+    .btn-blue:hover {
+        background-color: #0b5ed7;
+    }
+
+    .toggle-link {
+        color: var(--link-color);
+        text-decoration: none;
+    }
+
+    .toggle-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+
+<div class="form-container">
+    <h3 class="text-center mb-4">Login</h3>
+    <form asp-action="Login" method="post">
+        <div class="mb-3">
+            <label asp-for="Username" class="form-label">Username</label>
+            <input class="form-control" asp-for="Username" required />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label">Password</label>
+            <input class="form-control" asp-for="Password" type="password" required />
+        </div>
+        <div class="d-grid mb-2">
+            <button type="submit" class="btn btn-blue">Login</button>
+        </div>
+        <div class="text-center">
+            <p>
+                Don't have an account?
+                <a asp-controller="Users" asp-action="Register" class="toggle-link">Register</a>
+            </p>
+        </div>
+    </form>
+</div>
+
+<!-- Modal popup when login fails -->
+<div class="modal fade" id="loginErrorModal" tabindex="-1" aria-labelledby="loginErrorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="loginErrorModalLabel">Login Failed</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @ViewData["LoginError"]
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var errorExists = `@ViewData["LoginError"]` !== ``;
+            if (errorExists) {
+                var myModal = new bootstrap.Modal(document.getElementById('loginErrorModal'));
+                myModal.show();
+            }
+        });
+    </script>
+}

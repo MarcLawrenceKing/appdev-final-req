@@ -1,0 +1,192 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@model appdev_final_req.Models.DashboardViewModel
+
+<style>
+    :root[data-bs-theme='light'] {
+        --page-bg: #ffffff;
+        --card-bg: #ffffff;
+        --card-header-bg: #d6eaff;
+        --border-color: #dee2e6;
+        --link-color: #0d6efd;
+        --text-color: #212529;
+    }
+
+    :root[data-bs-theme='dark'] {
+        --page-bg: #212529;
+        --card-bg: #1e1e2f;
+        --card-header-bg: #578FCA;
+        --border-color: #2a2a2a;
+        --link-color: #6aa5f8;
+        --text-color: #ffffff;
+    }
+
+    body {
+        background-color: var(--page-bg);
+        color: var(--text-color);
+        font-family: 'Poppins', sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        border: 1px solid var(--border-color);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .card-header {
+        background-color: var(--card-header-bg);
+        color: var(--text-color);
+        font-weight: bold;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .list-group-item {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border-color: var(--border-color);
+    }
+
+    h1, h2, h4, h5, h6 {
+        color: var(--text-color);
+    }
+
+    a {
+        color: var(--link-color);
+    }
+</style>
+
+
+<h1 style="text-align: center; font-family: 'Poppins', sans-serif">📋 Attendance Dashboard</h1>
+<p style="text-align: center;">System features, setup instructions, and real-time analytics.</p>
+
+<div class="d-flex justify-content-center gap-3 flex-column">
+    <div class="card mt-4">
+        <div class="card-header text-center">
+            🌟 System Features Overview
+        </div>
+        <ol class="list-group list-group-flush">
+            <li class="list-group-item">
+                <strong>🎨 User Interface</strong>
+                <p class="mt-2">
+                    <span class="fw-medium">Light/Dark Mode Toggle:</span> Easily switch between themes.<br />
+                    <span class="fw-medium">Responsive Layout:</span> Looks good on any screen.
+                </p>
+            </li>
+            <li class="list-group-item">
+                <strong>📊 Dashboard Overview</strong>
+                <p class="mt-2">
+                    <span class="fw-medium">Live Analytics:</span> Gain insights based on members, events, and attendance data.
+                </p>
+            </li>
+        </ol>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header text-center">📌 Instructions</div>
+        <ol class="list-group list-group-numbered list-group-flush bold-numbers text-justify">
+            <li class="list-group-item"><strong>Register or Log In</strong><br />Create a new account or log in.</li>
+            <li class="list-group-item"><strong>Import Members</strong><br />Use batch import under Members tab.</li>
+            <li class="list-group-item"><strong>Create an Event</strong><br />Add event name, date, and details.</li>
+            <li class="list-group-item"><strong>Open Attendance Tab</strong><br />Select the created event.</li>
+            <li class="list-group-item"><strong>Mark Attendance</strong><br />Check names and click save.</li>
+        </ol>
+    </div>
+</div>
+
+<div class="mt-5 d-flex flex-column">
+    <h2 style="text-align: center">📈 Analytics</h2>
+    <p style="text-align: center;">@Model.today.ToString("MMMM d, yyyy")</p>
+
+    <h5 class="mt-4 mb-3 text-center">👥 Members</h5>
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Total Members</h6>
+                    <h4 class="mb-0">@Model.TotalMembers</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Active Members</h6>
+                    <h4 class="mb-0">@Model.ActiveMembers</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Average Member Age</h6>
+                    <h4 class="mb-0">@Model.AverageMemberAge</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5 class="mt-4 mb-3 text-center">📅 Events</h5>
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Total Events</h6>
+                    <h4 class="mb-0">@Model.TotalEvents</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Upcoming Events</h6>
+                    <h4 class="mb-0">@Model.UpcomingEvents</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Past Events</h6>
+                    <h4 class="mb-0">@Model.PastEvents</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5 class="mt-4 mb-3 text-center">📝 Attendance</h5>
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Total Attendance Records</h6>
+                    <h4 class="mb-0">@Model.TotalAttendanceRecords</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Avg. Attendance per Event</h6>
+                    <h4 class="mb-0">@Model.AverageAttendancePerEvent</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-3 border border-primary">
+                <div class="text-start">
+                    <h6 class="mb-2 text-muted">Overall Attendance Rate</h6>
+                    <h4 class="mb-0">@Model.OverallAttendanceRate %</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

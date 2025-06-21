@@ -1,0 +1,238 @@
+﻿@{
+    ViewData["Title"] = "Mark Attendance";
+}
+@model List<appdev_final_req.Models.AttendanceViewModel>
+
+@{
+    var eventId = (int)ViewBag.EventId;
+    bool isSaved = ViewBag.Saved ?? false;
+}
+
+<style>
+    :root[data-bs-theme='light'] {
+        --page-bg: #ffffff;
+        --text-color: #212529;
+        --card-bg: #ffffff;
+        --table-header-bg: #e3f2fd;
+        --table-border: #dee2e6;
+        --success: #d1e7dd;
+        --danger: #f8d7da;
+    }
+
+    :root[data-bs-theme='dark'] {
+        --page-bg: #212529;
+        --text-color: #ffffff;
+        --card-bg: #1e1e2f;
+        --table-header-bg: #2c3e50;
+        --table-border: #6aa5f8;
+        --success: #1e3e30;
+        --danger: #4a1e1e;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--page-bg);
+        color: var(--text-color);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1, p {
+        text-align: center;
+    }
+
+    .table {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table th {
+        background-color: var(--table-header-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table td {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table-success th, .table-success td {
+        background-color: var(--success) !important;
+    }
+
+    .table-danger th, .table-danger td {
+        background-color: var(--danger) !important;
+    }
+
+    .form-control, .btn {
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .form-check-input.custom-check:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+
+    .present-checkbox {
+        transform: scale(1.5);
+    }
+
+    .search-bar {
+        max-width: 250px;
+    }
+</style>
+
+<h1>📝 Mark Attendance</h1>
+<p>Mark attendance for <strong>@ViewBag.EventTitle</strong></p>
+
+@if (!isSaved)
+{
+    <!-- SEARCH FORM -->
+    <form asp-action="MarkAttendance" method="get" asp-route-id="@eventId">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex search-bar" role="search">
+                <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
+                <button class="btn btn-outline-primary" type="submit">🔍</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- ATTENDANCE FORM -->
+    <form asp-action="MarkAttendance" method="post">
+        <input type="hidden" name="eventId" value="@eventId" />
+
+        <table class="table table-bordered rounded-2 mt-2" id="attendanceTable">
+            <thead>
+                <tr>
+                    <th onclick="sortAttendanceTable(0)">Member ID <span id="sortIcon0" class="sort-icon"></span></th>
+                    <th onclick="sortAttendanceTable(1)">Member <span id="sortIcon1" class="sort-icon"></span></th>
+                    <th class="text-center" onclick="sortAttendanceTable(2)">
+                        Present (✔️)
+                        <span id="sortIcon2" class="sort-icon"></span>
+                        <input type="checkbox" id="selectAll" class="form-check-input ms-2" onclick="toggleAllCheckboxes(this)" />
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var item = Model[i];
+                    <tr>
+                        <td>@item.MemberId</td>
+                        <td>@item.FullName</td>
+                        <td class="text-center">
+                            <input type="hidden" name="attendanceList[@i].MemberId" value="@item.MemberId" />
+                            <input class="form-check-input custom-check present-checkbox" type="checkbox" name="attendanceList[@i].IsPresent" value="true" @(item.IsPresent ? "checked" : "") />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-success px-4 py-2" type="submit">Save</button>
+            <a asp-controller="Attendance" asp-action="List" class="btn btn-secondary px-4 py-2">Cancel</a>
+        </div>
+    </form>
+}
+else
+{
+    <h5 class="mt-4">✅ Present Members</h5>
+    <table class="table table-bordered table-success rounded-2 mt-2">
+        <thead>
+            <tr>
+                <th>Member ID</th>
+                <th>Member</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(m => m.IsPresent))
+            {
+                <tr>
+                    <td>@item.MemberId</td>
+                    <td>@item.FullName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h5 class="mt-4">❌ Absent Members</h5>
+    <table class="table table-bordered table-danger rounded-2 mt-2">
+        <thead>
+            <tr>
+                <th>Member ID</th>
+                <th>Member</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(m => !m.IsPresent))
+            {
+                <tr>
+                    <td>@item.MemberId</td>
+                    <td>@item.FullName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="mt-4 text-center">
+        <a asp-controller="Attendance" asp-action="List" class="btn btn-secondary px-4 py-2">Back to Events</a>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        let sortDirectionAttendance = {};
+        let lastSortedAttendanceCol = null;
+
+        function sortAttendanceTable(colIndex) {
+            const table = document.getElementById("attendanceTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            sortDirectionAttendance[colIndex] = !sortDirectionAttendance[colIndex];
+
+            rows.sort((a, b) => {
+                if (colIndex === 2) {
+                    const aCheckbox = a.cells[colIndex].querySelector('input[type="checkbox"]');
+                    const bCheckbox = b.cells[colIndex].querySelector('input[type="checkbox"]');
+                    const aChecked = aCheckbox?.checked ? 1 : 0;
+                    const bChecked = bCheckbox?.checked ? 1 : 0;
+
+                    return sortDirectionAttendance[colIndex]
+                        ? bChecked - aChecked
+                        : aChecked - bChecked;
+                }
+
+                const aText = a.cells[colIndex].textContent.trim().toLowerCase();
+                const bText = b.cells[colIndex].textContent.trim().toLowerCase();
+                return sortDirectionAttendance[colIndex]
+                    ? aText.localeCompare(bText)
+                    : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            if (lastSortedAttendanceCol !== null && lastSortedAttendanceCol !== colIndex) {
+                const oldIcon = document.getElementById(`sortIcon${lastSortedAttendanceCol}`);
+                if (oldIcon) oldIcon.innerHTML = '';
+            }
+
+            const iconSpan = document.getElementById(`sortIcon${colIndex}`);
+            iconSpan.innerHTML = sortDirectionAttendance[colIndex]
+                ? '<i class="bi bi-caret-up-fill"></i>'
+                : '<i class="bi bi-caret-down-fill"></i>';
+
+            lastSortedAttendanceCol = colIndex;
+        }
+
+        // ✅ Select All Present checkbox toggle
+        function toggleAllCheckboxes(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('.present-checkbox');
+            checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+        }
+    </script>
+}

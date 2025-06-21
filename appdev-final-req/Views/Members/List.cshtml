@@ -1,6 +1,275 @@
 ﻿@{
-    ViewData["Title"] = "Members List";
+    ViewData["Title"] = "Members";
 }
-<h1>@ViewData["Title"]</h1>
+@model List<appdev_final_req.Models.Entitiess.Member>
 
-<p>Members List.</p>
+<style>
+    :root[data-bs-theme='light'] {
+        --page-bg: #ffffff;
+        --card-bg: #ffffff;
+        --border-color: #dee2e6;
+        --link-color: #0d6efd;
+        --text-color: #212529;
+        --thead-bg: #d6eaff;
+        --table-header-bg: #e3f2fd;
+        --table-border: #dee2e6;
+    }
+
+    :root[data-bs-theme='dark'] {
+        --page-bg: #212529;
+        --card-bg: #1e1e2f;
+        --border-color: #2a2a2a;
+        --link-color: #6aa5f8;
+        --text-color: #ffffff;
+        --thead-bg: #2c3e50;
+        --table-header-bg: #2c3e50;
+        --table-border: #6aa5f8;
+    }
+
+    .table {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table th {
+        background-color: var(--table-header-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table td {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+
+    .form-control,
+    .form-control:focus {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+
+    .modal-content {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+
+    .modal-header,
+    .modal-footer {
+        border-color: var(--border-color);
+    }
+
+    a {
+        color: var(--link-color);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--link-color);
+        color: #fff;
+    }
+
+    input[type="search"].form-control {
+        border: 1px solid #ccc !important;
+    }
+</style>
+
+<h1 class="text-center">📋 Members</h1>
+<p class="text-center">View, add, and edit the list of registered members in your organization.</p>
+
+<div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form class="d-flex" role="search" method="get" asp-action="List">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
+            <button class="btn btn-outline-primary" type="submit">🔍</button>
+        </form>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">📥 Import</button>
+            <a class="btn btn-primary" asp-controller="Members" asp-action="Add">➕ New</a>
+            <!-- DELETE FORM AND BUTTON (Updated) -->
+            <form asp-controller="Members" asp-action="DeleteSelected" method="post" id="deleteSelectedForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ids" id="selectedIdsInput" />
+                <button type="button" class="btn btn-danger" id="deleteSelectedBtn" disabled data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+                    🗑️ Delete
+                </button>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success mt-3">@TempData["Message"]</div>
+    }
+
+    <table class="table table-bordered border-primary rounded-2 mt-2" id="membersTable">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th onclick="sortTable(1)">ID <span id="sortIcon1" class="sort-icon"></span></th>
+                <th onclick="sortTable(2)">FullName <span id="sortIcon2" class="sort-icon"></span></th>
+                <th onclick="sortTable(3)">Email <span id="sortIcon3" class="sort-icon"></span></th>
+                <th onclick="sortTable(4)">Phone <span id="sortIcon4" class="sort-icon"></span></th>
+                <th onclick="sortTable(5)">Birthdate <span id="sortIcon5" class="sort-icon"></span></th>
+                <th onclick="sortTable(6)">Active <span id="sortIcon6" class="sort-icon"></span></th>
+                <th onclick="sortTable(7)">Joined <span id="sortIcon7" class="sort-icon"></span></th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var member in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" class="row-checkbox" value="@member.Id" /></td>
+                    <td>@member.Id</td>
+                    <td>@member.FullName</td>
+                    <td>@member.Email</td>
+                    <td>@member.Phone</td>
+                    <td>@member.Birthdate</td>
+                    <td>@member.IsActive</td>
+                    <td>@member.DateJoined</td>
+                    <td class="text-center">
+                        <a class="btn btn-primary btn-sm" asp-controller="Members" asp-action="Edit" asp-route-id="@member.Id">✏️</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">📥 Import Members</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Members" asp-action="BatchUpload" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">CSV File</label>
+                        <input type="file" class="form-control" name="file" id="file" accept=".csv" required />
+                    </div>
+                    @if (TempData["UploadMessage"] != null)
+                    {
+                        <div class="alert alert-info">@TempData["UploadMessage"]</div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-danger">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="deleteConfirmModalLabel">🗑️ Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="deleteModalBody">
+                Are you sure you want to delete the selected members?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="deleteSelectedForm" class="btn btn-danger">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Select all checkbox logic
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll(".row-checkbox");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // Update selected IDs before form submission
+        document.getElementById("deleteSelectedForm").addEventListener("submit", function (e) {
+            const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+            document.getElementById("selectedIdsInput").value = ids.join(",");
+        });
+
+        // Enable/disable delete button and update modal text
+        document.querySelectorAll(".row-checkbox, #selectAll").forEach(cb => {
+            cb.addEventListener("change", function () {
+                const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
+                const deleteBtn = document.getElementById("deleteSelectedBtn");
+                deleteBtn.disabled = checkedBoxes.length === 0;
+
+                const deleteModalBody = document.getElementById("deleteModalBody");
+                if (checkedBoxes.length > 0) {
+                    deleteModalBody.innerHTML = `Are you sure you want to delete <strong>${checkedBoxes.length}</strong> member(s)?`;
+                } else {
+                    deleteModalBody.innerHTML = `Are you sure you want to delete the selected members?`;
+                }
+            });
+        });
+
+        // Sorting logic
+        let sortDirection = {};
+        let lastSortedCol = null;
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById("membersTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].textContent.trim().toLowerCase();
+                const bText = b.cells[columnIndex].textContent.trim().toLowerCase();
+
+                if (!isNaN(Date.parse(aText)) && !isNaN(Date.parse(bText))) {
+                    return sortDirection[columnIndex] ? new Date(aText) - new Date(bText) : new Date(bText) - new Date(aText);
+                }
+
+                if (!isNaN(aText) && !isNaN(bText)) {
+                    return sortDirection[columnIndex] ? aText - bText : bText - aText;
+                }
+
+                return sortDirection[columnIndex] ? aText.localeCompare(bText) : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            if (lastSortedCol && lastSortedCol !== columnIndex) {
+                const oldIcon = document.getElementById(`sortIcon${lastSortedCol}`);
+                if (oldIcon) oldIcon.innerHTML = '';
+            }
+
+            const icon = sortDirection[columnIndex]
+                ? '<i class="bi bi-caret-up-fill"></i>'
+                : '<i class="bi bi-caret-down-fill"></i>';
+            const iconSpan = document.getElementById(`sortIcon${columnIndex}`);
+            if (iconSpan) iconSpan.innerHTML = icon;
+
+            lastSortedCol = columnIndex;
+        }
+
+        // Auto-reopen modal if UploadMessage exists
+        window.addEventListener("DOMContentLoaded", function () {
+            const hasUploadMessage = '@TempData["UploadMessage"]' !== '';
+            if (hasUploadMessage) {
+                const importModal = new bootstrap.Modal(document.getElementById("importModal"));
+                importModal.show();
+            }
+        });
+    </script>
+}

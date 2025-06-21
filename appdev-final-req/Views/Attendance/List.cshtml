@@ -1,6 +1,134 @@
 ﻿@{
-    ViewData["Title"] = "Attendance List";
+    ViewData["Title"] = "📒Attendance";
 }
-<h1>@ViewData["Title"]</h1>
+@model List<appdev_final_req.Models.Entitiess.Event>
 
-<p>Attendance List.</p>
+<style>
+    :root[data-bs-theme='light'] {
+        --page-bg: #ffffff;
+        --text-color: #212529;
+        --card-bg: #ffffff;
+        --table-header-bg: #e3f2fd;
+        --table-border: #dee2e6;
+    }
+
+    :root[data-bs-theme='dark'] {
+        --page-bg: #212529;
+        --text-color: #ffffff;
+        --card-bg: #1e1e2f;
+        --table-header-bg: #2c3e50;
+        --table-border: #6aa5f8;
+    }
+
+    body {
+        background-color: var(--page-bg);
+        color: var(--text-color);
+        font-family: 'Poppins', sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1, p {
+        text-align: center;
+    }
+
+    .table {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table th {
+        background-color: var(--table-header-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .table td {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--table-border);
+    }
+
+    .form-control, .btn {
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+</style>
+
+<h1>@ViewData["Title"]</h1>
+<p>Mark members' attendance according to events here.</p>
+
+<div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form class="d-flex" role="search" method="get" asp-action="List">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search" value="@Context.Request.Query["search"]" />
+            <button class="btn btn-outline-primary" type="submit">🔍</button>
+        </form>
+    </div>
+
+    <table class="table table-bordered rounded-2 mt-4" id="eventsTable">
+        <thead>
+            <tr>
+                <th onclick="sortEventsTable(0)">Event Title <span id="eventSortIcon0" class="sort-icon"></span></th>
+                <th onclick="sortEventsTable(1)">Event Date <span id="eventSortIcon1" class="sort-icon"></span></th>
+                <th class="text-center">View File</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var eventz in Model)
+            {
+                <tr>
+                    <td>@eventz.Title</td>
+                    <td>@eventz.EventDate.ToString("MMMM dd, yyyy")</td>
+                    <td class="text-center">
+                        <a class="btn btn-primary btn-sm" asp-controller="Attendance" asp-action="MarkAttendance" asp-route-id="@eventz.Id">
+                            📋
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let eventSortDir = {};
+        let lastSortedEventCol = null;
+
+        function sortEventsTable(colIndex) {
+            const table = document.getElementById("eventsTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            eventSortDir[colIndex] = !eventSortDir[colIndex];
+
+            rows.sort((a, b) => {
+                const aText = a.cells[colIndex].textContent.trim().toLowerCase();
+                const bText = b.cells[colIndex].textContent.trim().toLowerCase();
+
+                // Sort as dates if column is Event Date
+                if (colIndex === 1 && !isNaN(Date.parse(aText)) && !isNaN(Date.parse(bText))) {
+                    return eventSortDir[colIndex]
+                        ? new Date(aText) - new Date(bText)
+                        : new Date(bText) - new Date(aText);
+                }
+
+                return eventSortDir[colIndex]
+                    ? aText.localeCompare(bText)
+                    : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            if (lastSortedEventCol !== null && lastSortedEventCol !== colIndex) {
+                document.getElementById(`eventSortIcon${lastSortedEventCol}`).innerHTML = '';
+            }
+
+            document.getElementById(`eventSortIcon${colIndex}`).innerHTML = eventSortDir[colIndex]
+                ? '<i class="bi bi-caret-up-fill"></i>'
+                : '<i class="bi bi-caret-down-fill"></i>';
+
+            lastSortedEventCol = colIndex;
+        }
+    </script>
+}

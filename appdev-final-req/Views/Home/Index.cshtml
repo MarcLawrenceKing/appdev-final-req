@@ -1,8 +1,65 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewBag.Title = "AttendanceMo'To";
+    ViewBag.HomeLayout = true;
 }
+<head>
+    <style>
+    :root[data-bs-theme='dark'] .highlight {
+        color: #578FCA;
+    }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    :root[data-bs-theme='light'] .highlight {
+        background: radial-gradient(circle, #fff8c7 0%, #ffffff 90%);
+        color: #578FCA;
+    }
+
+    .hero-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-title {
+        font-weight: 700;
+        font-size: 2.2rem;
+    }
+
+    .hero-desc {
+        font-size: 0.95rem;
+        margin-top: 15px;
+        color: #578FCA;
+    }
+
+    .btn-custom {
+        width: 110px;
+        margin-right: 10px;
+    }
+
+    img.hero-img {
+        max-width: 100%;
+        height: auto;
+    }
+    </style>
+</head>
+
+<div class="container-fluid hero-section g-0">
+    <div class="row align-items-center w-100 h-100 g-0">
+        <!-- Left -->
+        <div class="col-md-6 px-4">
+            <div class="highlight text-center text-md-start">
+                <h1 class="hero-title">AttendanceMo'To:<br>Your go-to for precise and easy tracking.</h1>
+                <p class="hero-desc">
+                    AttendanceMo'To is designed to help schools, offices, or organizations record attendance accurately, efficiently, and in real-time...
+                </p>
+                <div class="mt-4">
+                    <a asp-controller="Users" asp-action="Register" class="btn btn-outline-primary btn-custom">Register</a>
+                    <a asp-controller="Users" asp-action="Login" class="btn btn-outline-primary btn-custom">Login</a>
+                </div>
+            </div>
+        </div>
+        <!-- Right -->
+        <div class="col-md-6 g-0 text-end pe-0">
+            <img src="~/images/picture.png" alt="Hero Image" class="hero-img" />
+        </div>
+    </div>
 </div>
